@@ -1,0 +1,272 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!-- Thống kê tổng quan -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="stats-card position-relative" style="border-left-color: #3498db;">
+            <div class="stats-number">@ViewBag.TongNguoiDung</div>
+            <div class="stats-label">Người dùng</div>
+            <i class="fas fa-users" style="color: #3498db;"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card position-relative" style="border-left-color: #27ae60;">
+            <div class="stats-number">@ViewBag.TongVeDaBan</div>
+            <div class="stats-label">Vé đã bán</div>
+            <i class="fas fa-ticket-alt" style="color: #27ae60;"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card position-relative" style="border-left-color: #f39c12;">
+            <div class="stats-number">@ViewBag.TongTuyenDuong</div>
+            <div class="stats-label">Tuyến đường</div>
+            <i class="fas fa-route" style="color: #f39c12;"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card position-relative" style="border-left-color: #e74c3c;">
+            <div class="stats-number">@ViewBag.TongXe</div>
+            <div class="stats-label">Xe buýt</div>
+            <i class="fas fa-bus" style="color: #e74c3c;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Thống kê doanh thu -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="stats-card position-relative" style="border-left-color: #9b59b6;">
+            <div class="stats-number">@(((decimal)ViewBag.DoanhThuHomNay).ToString("N0"))</div>
+            <div class="stats-label">Doanh thu hôm nay (VNĐ)</div>
+            <i class="fas fa-coins" style="color: #9b59b6;"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card position-relative" style="border-left-color: #1abc9c;">
+            <div class="stats-number">@(((decimal)ViewBag.DoanhThuThang).ToString("N0"))</div>
+            <div class="stats-label">Doanh thu tháng này (VNĐ)</div>
+            <i class="fas fa-chart-line" style="color: #1abc9c;"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card position-relative" style="border-left-color: #e67e22;">
+            <div class="stats-number">@ViewBag.ChuyenXeChoDuyet</div>
+            <div class="stats-label">Chuyến xe chờ duyệt</div>
+            <i class="fas fa-clock" style="color: #e67e22;"></i>
+            @if (ViewBag.ChuyenXeChoDuyet > 0)
+            {
+                <div class="position-absolute top-0 start-100 translate-middle">
+                    <span class="badge rounded-pill bg-danger">!</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Quản lý nhanh và Top tuyến đường -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Quản lý nhanh
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a asp-action="QuanLyNguoiDung" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="border-left: 4px solid #3498db;">
+                        <div>
+                            <i class="fas fa-users me-2" style="color: #3498db;"></i>
+                            Quản lý người dùng
+                        </div>
+                        <span class="badge rounded-pill" style="background-color: #3498db;">@ViewBag.TongNguoiDung</span>
+                    </a>
+                    <a asp-action="QuanLyTuyenDuong" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="border-left: 4px solid #f39c12;">
+                        <div>
+                            <i class="fas fa-route me-2" style="color: #f39c12;"></i>
+                            Quản lý tuyến đường
+                        </div>
+                        <span class="badge rounded-pill" style="background-color: #f39c12;">@ViewBag.TongTuyenDuong</span>
+                    </a>
+                    <a asp-area="Admin" asp-controller="QuanLyXe" asp-action="Index" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="border-left: 4px solid #e74c3c;">
+                        <div>
+                            <i class="fas fa-bus me-2" style="color: #e74c3c;"></i>
+                            Quản lý xe buýt
+                        </div>
+                        <span class="badge rounded-pill" style="background-color: #e74c3c;">@ViewBag.TongXe</span>
+                    </a>
+                    <a asp-action="QuanLyChuyenXe" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="border-left: 4px solid #34495e;">
+                        <div>
+                            <i class="fas fa-calendar-alt me-2" style="color: #34495e;"></i>
+                            Quản lý chuyến xe
+                        </div>
+                        <span class="badge rounded-pill" style="background-color: #34495e;">@ViewBag.TongChuyenXe</span>
+                    </a>
+                    @if (ViewBag.ChuyenXeChoDuyet > 0)
+                    {
+                        <a asp-action="DuyetChuyenXe" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="border-left: 4px solid #e67e22;">
+                            <div>
+                                <i class="fas fa-clock me-2" style="color: #e67e22;"></i>
+                                Duyệt chuyến xe
+                            </div>
+                            <span class="badge rounded-pill bg-warning text-dark">@ViewBag.ChuyenXeChoDuyet</span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-star"></i>
+                    Top 5 tuyến đường bán chạy
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.TopTuyenDuong != null && ((IEnumerable<dynamic>)ViewBag.TopTuyenDuong).Any())
+                {
+                    <div class="list-group">
+                        @foreach (var tuyen in (IEnumerable<dynamic>)ViewBag.TopTuyenDuong)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-route me-2 text-primary"></i>
+                                    @tuyen.TuyenDuong
+                                </div>
+                                <span class="badge bg-primary rounded-pill">@tuyen.SoVe vé</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-chart-line fa-2x mb-2"></i>
+                        <p>Chưa có dữ liệu bán vé</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Đánh giá mới nhất và Báo cáo nhanh -->
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-comments"></i>
+                    Đánh giá mới nhất
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.DanhGiaMoiNhat != null && ((IEnumerable<dynamic>)ViewBag.DanhGiaMoiNhat).Any())
+                {
+                    @foreach (var danhGia in (IEnumerable<dynamic>)ViewBag.DanhGiaMoiNhat)
+                    {
+                        <div class="d-flex mb-3 pb-3 border-bottom">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">@danhGia.NguoiDung?.HoTen</h6>
+                                        <small class="text-muted">@danhGia.Ve?.ChuyenXe?.TuyenDuong?.DiemDi → @danhGia.Ve?.ChuyenXe?.TuyenDuong?.DiemDen</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="text-warning mb-1">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="fas fa-star @(i <= danhGia.DiemDanhGia ? "" : "text-muted")"></i>
+                                            }
+                                        </div>
+                                        <small class="text-muted">@danhGia.ThoiGianDanhGia.ToString("dd/MM/yyyy")</small>
+                                    </div>
+                                </div>
+                                <p class="mb-0 mt-2">@danhGia.NoiDung</p>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-comments fa-2x mb-2"></i>
+                        <p>Chưa có đánh giá nào</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar"></i>
+                    Báo cáo nhanh
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+
+                    <a asp-area="Admin" asp-controller="KhuyenMai" asp-action="Dashboard" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="border-left: 4px solid #1abc9c;">
+                        <div>
+                            <i class="fas fa-tags me-2" style="color: #1abc9c;"></i>
+                            Thống kê khuyến mãi
+                        </div>
+                        <i class="fas fa-arrow-right text-muted"></i>
+                    </a>
+                    <a asp-action="QuanLyDanhGia" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="border-left: 4px solid #f39c12;">
+                        <div>
+                            <i class="fas fa-star me-2" style="color: #f39c12;"></i>
+                            Quản lý đánh giá
+                        </div>
+                        <i class="fas fa-arrow-right text-muted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông báo hệ thống -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bell"></i>
+                    Thông báo hệ thống
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.ChuyenXeChoDuyet > 0)
+                {
+                    <div class="alert alert-warning py-2 mb-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>@ViewBag.ChuyenXeChoDuyet</strong> chuyến xe đang chờ duyệt
+                    </div>
+                }
+                <div class="alert alert-info py-2 mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Hệ thống hoạt động bình thường
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Auto refresh dashboard every 5 minutes
+        setTimeout(function() {
+            location.reload();
+        }, 300000);
+    </script>
+}

@@ -1,0 +1,286 @@
+@model DatVeXe.Models.Xe
+@{
+    ViewData["Title"] = "Chi tiết xe";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">
+                        <i class="fas fa-bus text-primary"></i>
+                        Chi tiết xe
+                    </h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Trang chủ
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="QuanLyXe" asp-action="Index">
+                                <i class="fas fa-bus"></i> Quản lý xe
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">Chi tiết xe</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            @if (TempData["ThongBao"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    @TempData["ThongBao"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+
+            <div class="row">
+                <!-- Thông tin cơ bản -->
+                <div class="col-md-8">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title text-dark">
+                                <i class="fas fa-info-circle"></i>
+                                Thông tin xe
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <!-- Info boxes hàng đầu -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-primary">
+                                            <i class="fas fa-id-card"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-dark">Biển số xe</span>
+                                            <span class="info-box-number text-dark">@Model.BienSoXe</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-info">
+                                            <i class="fas fa-bus"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-dark">Loại xe</span>
+                                            <span class="info-box-number text-dark">@Model.LoaiXe</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Info boxes hàng thứ hai -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-success">
+                                            <i class="fas fa-chair"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-dark">Số ghế</span>
+                                            <span class="info-box-number text-dark">@Model.SoGhe ghế</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-warning">
+                                            <i class="fas fa-calendar-plus"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-dark">Ngày tạo</span>
+                                            <span class="info-box-number text-dark">@Model.NgayTao.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin chi tiết -->
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="text-dark font-weight-bold">
+                                            <i class="fas fa-sticky-note text-info"></i>
+                                            Mô tả xe
+                                        </label>
+                                        <div class="bg-light p-3 rounded border">
+                                            <p class="text-dark mb-0">
+                                                @(string.IsNullOrEmpty(Model.MoTa) ? "Không có mô tả" : Model.MoTa)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="text-dark font-weight-bold">
+                                            <i class="fas fa-toggle-on text-primary"></i>
+                                            Trạng thái hoạt động
+                                        </label>
+                                        <div class="bg-light p-3 rounded border">
+                                            @if (Model.TrangThaiHoatDong)
+                                            {
+                                                <span class="badge badge-success badge-lg">
+                                                    <i class="fas fa-check-circle"></i> Đang hoạt động
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-danger badge-lg">
+                                                    <i class="fas fa-times-circle"></i> Ngừng hoạt động
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thống kê -->
+                <div class="col-md-4">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title text-dark">
+                                <i class="fas fa-chart-bar"></i>
+                                Thống kê xe
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            @if (ViewBag.TongChuyenXe != null)
+                            {
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-primary">
+                                        <i class="fas fa-route"></i>
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-dark">Tổng chuyến</span>
+                                        <span class="info-box-number text-dark">@ViewBag.TongChuyenXe</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-success">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-dark">Vé đã bán</span>
+                                        <span class="info-box-number text-dark">@ViewBag.TongVeDaBan</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text text-dark">Doanh thu</span>
+                                        <span class="info-box-number text-dark">@(((decimal?)ViewBag.DoanhThu ?? 0).ToString("N0")) VNĐ</span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted text-center">
+                                    <i class="fas fa-info-circle"></i>
+                                    Chưa có dữ liệu thống kê
+                                </p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Thông tin bổ sung -->
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title text-dark">
+                                <i class="fas fa-cogs"></i>
+                                Thông tin kỹ thuật
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="text-dark font-weight-bold">
+                                    <i class="fas fa-hashtag text-primary"></i>
+                                    Mã xe
+                                </label>
+                                <p class="form-control-static text-dark">
+                                    XE@Model.XeId.ToString("D4")
+                                </p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="text-dark font-weight-bold">
+                                    <i class="fas fa-industry text-info"></i>
+                                    Nhà sản xuất
+                                </label>
+                                <p class="form-control-static text-dark">
+                                    @(string.IsNullOrEmpty(Model.NhaSanXuat) ? "Chưa cập nhật" : Model.NhaSanXuat)
+                                </p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="text-dark font-weight-bold">
+                                    <i class="fas fa-calendar text-warning"></i>
+                                    Năm sản xuất
+                                </label>
+                                <p class="form-control-static text-dark">
+                                    @(Model.NamSanXuat?.ToString() ?? "Chưa cập nhật")
+                                </p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="text-dark font-weight-bold">
+                                    <i class="fas fa-palette text-danger"></i>
+                                    Màu sắc
+                                </label>
+                                <p class="form-control-static text-dark">
+                                    @(string.IsNullOrEmpty(Model.MauSac) ? "Chưa cập nhật" : Model.MauSac)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút thao tác -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <a asp-area="Admin" asp-controller="QuanLyXe" asp-action="Edit" asp-route-id="@Model.XeId"
+                                       class="btn btn-warning btn-lg">
+                                        <i class="fas fa-edit"></i>
+                                        Chỉnh sửa xe
+                                    </a>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <a asp-area="Admin" asp-controller="QuanLyXe" asp-action="Index"
+                                       class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-arrow-left"></i>
+                                        Quay lại danh sách
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,128 @@
+@model DatVeXe.Models.Xe
+@{
+    ViewData["Title"] = "Thêm xe mới";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 style="color: #2c3e50; font-weight: 600;">
+            <i class="fas fa-bus text-danger me-2"></i>
+            Thêm xe mới
+        </h3>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
+
+    @if (TempData["ThongBao"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            @TempData["ThongBao"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Thông tin xe mới
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="BienSoXe" class="form-label fw-bold" style="color: black;">
+                                        <i class="fas fa-id-card text-muted me-1"></i>
+                                        Biển số xe <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="BienSoXe" class="form-control" placeholder="Ví dụ: 30A-12345" />
+                                    <span asp-validation-for="BienSoXe" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="LoaiXe" class="form-label fw-bold" style="color: black;">
+                                        <i class="fas fa-bus text-muted me-1"></i>
+                                        Loại xe <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="LoaiXe" class="form-select">
+                                        <option value="">-- Chọn loại xe --</option>
+                                        <option value="Ghế ngồi">Ghế ngồi</option>
+                                        <option value="Giường nằm">Giường nằm</option>
+                                        <option value="Limousine">Limousine</option>
+                                    </select>
+                                    <span asp-validation-for="LoaiXe" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="SoGhe" class="form-label fw-bold" style="color: black;">
+                                        <i class="fas fa-chair text-muted me-1"></i>
+                                        Số ghế <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="SoGhe" type="number" min="1" max="50" class="form-control" placeholder="Số ghế" />
+                                    <span asp-validation-for="SoGhe" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="NamSanXuat" class="form-label fw-bold" style="color: black;">
+                                        <i class="fas fa-calendar text-muted me-1"></i>
+                                        Năm sản xuất
+                                    </label>
+                                    <input asp-for="NamSanXuat" type="number" min="1990" max="@DateTime.Now.Year" class="form-control" placeholder="Năm sản xuất" />
+                                    <span asp-validation-for="NamSanXuat" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" style="color: black;">Trạng thái</label>
+                                    <div class="form-check">
+                                        <input asp-for="TrangThaiHoatDong" class="form-check-input" type="checkbox" checked />
+                                        <label asp-for="TrangThaiHoatDong" class="form-check-label">
+                                            <i class="fas fa-check-circle text-success me-1"></i>
+                                            Xe hoạt động
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="MoTa" class="form-label fw-bold" style="color: black;">
+                                        <i class="fas fa-info-circle text-muted me-1"></i>
+                                        Mô tả
+                                    </label>
+                                    <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Mô tả thêm về xe (tùy chọn)"></textarea>
+                                    <span asp-validation-for="MoTa" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Hủy
+                            </a>
+                            <button type="reset" class="btn btn-outline-warning">
+                                <i class="fas fa-undo me-1"></i> Đặt lại
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-save me-1"></i> Lưu xe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,358 @@
+@{
+    ViewData["Title"] = "Thống kê người dùng";
+    var user = ViewBag.User as DatVeXe.Models.NguoiDung;
+    var transactions = ViewBag.Transactions as IEnumerable<DatVeXe.Models.ThanhToan>;
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 style="color: #2c3e50; font-weight: 600;">
+            <i class="fas fa-chart-line text-primary me-2"></i>
+            Thống kê chi tiết: @(user != null ? user.HoTen : "Người dùng")
+        </h3>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Details", new { id = user.NguoiDungId })" class="btn btn-info">
+                <i class="fas fa-user me-1"></i> Thông tin người dùng
+            </a>
+            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Summary -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        Thông tin tóm tắt
+                    </h6>
+                </div>
+                <div class="card-body text-center">
+                    <div class="user-avatar mb-3">
+                        <i class="fas fa-user-circle" style="font-size: 4rem; color: #6CABDD;"></i>
+                    </div>
+                    <h5 class="mb-2">@user.HoTen</h5>
+                    <p class="text-muted mb-3">@user.Email</p>
+                    
+                    @if (user.LaAdmin)
+                    {
+                        <span class="badge bg-warning text-dark mb-3">
+                            <i class="fas fa-crown me-1"></i>Quản trị viên
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary mb-3">
+                            <i class="fas fa-user me-1"></i>Người dùng
+                        </span>
+                    }
+
+                    <div class="row text-center">
+                        <div class="col-12 mb-2">
+                            <span class="badge bg-@(user.TrangThaiHoatDong ? "success" : "danger") fs-6">
+                                <i class="fas fa-@(user.TrangThaiHoatDong ? "check" : "times") me-1"></i>
+                                @(user.TrangThaiHoatDong ? "Hoạt động" : "Không hoạt động")
+                            </span>
+                        </div>
+                        <div class="col-12">
+                            <span class="badge bg-@(user.TaiKhoanBiKhoa ? "danger" : "success") fs-6">
+                                <i class="fas fa-@(user.TaiKhoanBiKhoa ? "lock" : "unlock") me-1"></i>
+                                @(user.TaiKhoanBiKhoa ? "Bị khoá" : "Bình thường")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card mt-3">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Thống kê nhanh
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-primary mb-1">@(user.Ves?.Count ?? 0)</h4>
+                            <small class="text-muted">Vé đã đặt</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success mb-1">@(transactions?.Sum(t => t.SoTien).ToString("N0") ?? "0")</h4>
+                            <small class="text-muted">Tổng chi tiêu</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info mb-1">@(transactions != null ? transactions.Count() : 0)</h4>
+                            <small class="text-muted">Giao dịch</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-warning mb-1">@(user.Ves?.Count(v => v.VeTrangThai == DatVeXe.Models.TrangThaiVe.DaHuy) ?? 0)</h4>
+                            <small class="text-muted">Vé đã hủy</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Charts and Details -->
+        <div class="col-md-8">
+            <!-- Transaction Statistics -->
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Thống kê giao dịch
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (transactions != null && transactions.Any())
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <canvas id="transactionChart" width="400" height="200"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Trạng thái</th>
+                                                <th>Số lượng</th>
+                                                <th>Tổng tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var group in transactions.GroupBy(t => t.TrangThai))
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge bg-@GetTransactionStatusColor(group.Key)">
+                                                            @group.Key.GetDisplayName()
+                                                        </span>
+                                                    </td>
+                                                    <td>@group.Count()</td>
+                                                    <td>@group.Sum(t => t.SoTien).ToString("N0") VNĐ</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Chưa có giao dịch nào</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Lịch sử giao dịch
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (transactions != null && transactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead style="background-color: #34495e; color: white;">
+                                    <tr>
+                                        <th>Mã GD</th>
+                                        <th>Tuyến đường</th>
+                                        <th>Ngày thanh toán</th>
+                                        <th>Số tiền</th>
+                                        <th>Phương thức</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in transactions.Take(20))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>#@transaction.ThanhToanId</strong>
+                                            </td>
+                                            <td>
+                                                @if (transaction.Ve?.ChuyenXe?.TuyenDuong != null)
+                                                {
+                                                    <small>
+                                                        @transaction.Ve.ChuyenXe.TuyenDuong.DiemDi 
+                                                        <i class="fas fa-arrow-right mx-1"></i> 
+                                                        @transaction.Ve.ChuyenXe.TuyenDuong.DiemDen
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">N/A</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <small>
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    @transaction.NgayThanhToan.ToString("dd/MM/yyyy")
+                                                    <br>
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    @transaction.NgayThanhToan.ToString("HH:mm")
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <strong class="text-success">
+                                                    @transaction.SoTien.ToString("N0") VNĐ
+                                                </strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    @transaction.PhuongThucThanhToan.GetDisplayName()
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@GetTransactionStatusColor(transaction.TrangThai)">
+                                                    @transaction.TrangThai.GetDisplayName()
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>                        @if (transactions != null && transactions.Count() > 20)
+                        {
+                            <div class="card-footer text-center">
+                                <small class="text-muted">
+                                    Hiển thị 20 giao dịch gần nhất. Tổng cộng: @transactions.Count() giao dịch
+                                </small>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Chưa có giao dịch nào</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetTransactionStatusColor(DatVeXe.Models.TrangThaiThanhToan trangThai)
+    {
+        return trangThai switch
+        {
+            DatVeXe.Models.TrangThaiThanhToan.ChoThanhToan => "secondary",
+            DatVeXe.Models.TrangThaiThanhToan.DangXuLy => "warning",
+            DatVeXe.Models.TrangThaiThanhToan.ThanhCong => "success",
+            DatVeXe.Models.TrangThaiThanhToan.ThatBai => "danger",
+            DatVeXe.Models.TrangThaiThanhToan.DaHuy => "secondary",
+            DatVeXe.Models.TrangThaiThanhToan.DaHoanTien => "info",
+            _ => "secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    <script>
+        @if (transactions != null && transactions.Any())
+        {
+            var transactionGroups = transactions.GroupBy(t => t.TrangThai).ToList();
+            
+            <text>
+            // Transaction Chart Data
+            var transactionData = [
+                @foreach (var group in transactionGroups)
+                {
+                    <text>
+                    {
+                        Label: '@group.Key.GetDisplayName()',
+                        Count: @group.Count(),
+                        Amount: @group.Sum(t => t.SoTien)
+                    },
+                    </text>
+                }
+            ];
+
+            // Transaction Chart
+            const ctx = document.getElementById('transactionChart').getContext('2d');
+            const transactionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: transactionData.map(d => d.Label),
+                    datasets: [{
+                        data: transactionData.map(d => d.Amount),
+                        backgroundColor: [
+                            '#28a745', // success
+                            '#ffc107', // warning  
+                            '#dc3545', // danger
+                            '#6c757d', // secondary
+                            '#17a2b8'  // info
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    return label + ': ' + value.toLocaleString() + ' VNĐ';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+    </script>
+}
+
+<style>
+    .user-avatar {
+        margin-bottom: 1rem;
+    }
+    
+    .card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+    
+    #transactionChart {
+        max-height: 300px;
+    }
+    
+    .table th {
+        border-top: none;
+    }
+    
+    .badge {
+        font-size: 0.75em;
+    }
+</style>

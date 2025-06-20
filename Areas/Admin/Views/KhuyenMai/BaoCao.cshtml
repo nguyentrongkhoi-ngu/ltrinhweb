@@ -1,0 +1,288 @@
+@model IEnumerable<DatVeXe.Models.LichSuKhuyenMai>
+
+@{
+    ViewData["Title"] = "Báo cáo chi tiết khuyến mãi";
+    var khuyenMai = (DatVeXe.Models.KhuyenMai)ViewBag.KhuyenMai;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 style="color: #2c3e50; font-weight: 600;">
+        <i class="fas fa-chart-line" style="color: #e74c3c;"></i>
+        Báo cáo chi tiết khuyến mãi
+    </h3>
+    <div>
+        <a asp-action="LichSuSuDung" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <button onclick="window.print()" class="btn btn-info">
+            <i class="fas fa-print"></i> In báo cáo
+        </button>
+    </div>
+</div>
+
+<!-- Thông tin khuyến mãi -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-info-circle"></i>
+            Thông tin khuyến mãi
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Mã khuyến mãi:</strong></td>
+                        <td><span class="badge bg-primary fs-6">@khuyenMai.MaKhuyenMai</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tên chương trình:</strong></td>
+                        <td>@khuyenMai.TenKhuyenMai</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Loại khuyến mãi:</strong></td>
+                        <td>
+                            @if (khuyenMai.LoaiKhuyenMai == LoaiKhuyenMai.GiamPhanTram)
+                            {
+                                <span class="badge bg-info">Giảm @khuyenMai.GiaTri%</span>
+                            }
+                            else if (khuyenMai.LoaiKhuyenMai == LoaiKhuyenMai.GiamSoTien)
+                            {
+                                <span class="badge bg-success">Giảm @khuyenMai.GiaTri.ToString("N0") VNĐ</span>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mô tả:</strong></td>
+                        <td>@(khuyenMai.MoTa ?? "Không có mô tả")</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Thời gian:</strong></td>
+                        <td>@khuyenMai.NgayBatDau.ToString("dd/MM/yyyy") - @khuyenMai.NgayKetThuc.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Số lượng tối đa:</strong></td>
+                        <td>@(khuyenMai.SoLuongToiDa?.ToString("N0") ?? "Không giới hạn")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Đã sử dụng:</strong></td>
+                        <td><strong>@khuyenMai.SoLuongDaSuDung.ToString("N0")</strong> lượt</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trạng thái:</strong></td>
+                        <td>
+                            @if (khuyenMai.TrangThaiHoatDong)
+                            {
+                                <span class="badge bg-success">Đang hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Tạm dừng</span>
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bộ lọc thời gian -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-calendar"></i>
+            Lọc theo thời gian
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="BaoCao">
+            <input type="hidden" name="id" value="@khuyenMai.KhuyenMaiId" />
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" name="tuNgay" class="form-control" value="@(ViewBag.TuNgay != null ? ((DateTime)ViewBag.TuNgay).ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" name="denNgay" class="form-control" value="@(ViewBag.DenNgay != null ? ((DateTime)ViewBag.DenNgay).ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Lọc dữ liệu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Thống kê tổng quan -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h3>@ViewBag.TongLuotSuDung</h3>
+                <p class="mb-0">Tổng lượt sử dụng</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h3>@(((decimal)ViewBag.TongTienGiam).ToString("N0"))</h3>
+                <p class="mb-0">Tổng tiền giảm (VNĐ)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h3>@(((decimal)ViewBag.TrungBinhGiamMoiLan).ToString("N0"))</h3>
+                <p class="mb-0">TB mỗi lần (VNĐ)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h3>@(((IEnumerable<dynamic>)ViewBag.ThongKeTuyen).Count())</h3>
+                <p class="mb-0">Tuyến đường sử dụng</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thống kê theo tuyến đường -->
+@if (((IEnumerable<dynamic>)ViewBag.ThongKeTuyen).Any())
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-route"></i>
+                Thống kê theo tuyến đường
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Tuyến đường</th>
+                            <th>Số lượt sử dụng</th>
+                            <th>Tổng tiền giảm</th>
+                            <th>Tỷ lệ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in (IEnumerable<dynamic>)ViewBag.ThongKeTuyen)
+                        {
+                            var tyLe = ViewBag.TongLuotSuDung > 0 ? (decimal)item.SoLuotSuDung / ViewBag.TongLuotSuDung * 100 : 0;
+                            <tr>
+                                <td><strong>@item.TuyenDuong</strong></td>
+                                <td>@item.SoLuotSuDung lượt</td>
+                                <td>@(((decimal)item.TongTienGiam).ToString("N0")) VNĐ</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar" role="progressbar" style="width: @tyLe%">
+                                            @tyLe.ToString("F1")%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Chi tiết lịch sử sử dụng -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list"></i>
+            Chi tiết lịch sử sử dụng
+        </h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Khách hàng</th>
+                            <th>Tuyến đường</th>
+                            <th>Thời gian</th>
+                            <th>Giá trị giảm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var stt = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>
+                                    <div>
+                                        <strong>@item.NguoiDung?.HoTen</strong>
+                                        @if (!string.IsNullOrEmpty(item.NguoiDung?.SoDienThoai))
+                                        {
+                                            <br><small class="text-muted">@item.NguoiDung.SoDienThoai</small>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (item.Ve?.ChuyenXe?.TuyenDuong != null)
+                                    {
+                                        <span>@item.Ve.ChuyenXe.TuyenDuong.DiemDi → @item.Ve.ChuyenXe.TuyenDuong.DiemDen</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    @item.ThoiGianSuDung.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">@item.GiaTriGiam.ToString("N0") VNĐ</span>
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                <p>Không có dữ liệu sử dụng trong khoảng thời gian được chọn</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        @@media print {
+            .btn, .card-header { display: none !important; }
+            .card { border: none !important; }
+        }
+    </style>
+}

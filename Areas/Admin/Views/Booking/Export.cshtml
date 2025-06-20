@@ -1,0 +1,11 @@
+@model IEnumerable<dynamic>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Xuất danh sách hành khách";
+}
+<ol class="breadcrumb mb-3">
+    <li class="breadcrumb-item"><a href="/Admin">Admin</a></li>
+    <li class="breadcrumb-item"><a href="/Admin/Booking/List">Quản lý đặt vé</a></li>
+    <li class="breadcrumb-item active">Xuất danh sách hành khách</li>
+</ol>
+<!-- Nội dung xuất file sẽ được render động từ controller, hoặc bạn có thể render lại bảng tại đây nếu muốn -->

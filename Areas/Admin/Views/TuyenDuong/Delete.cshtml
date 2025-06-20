@@ -1,0 +1,29 @@
+@model DatVeXe.Models.TuyenDuong
+@{
+    ViewData["Title"] = "Xóa tuyến đường";
+}
+<h2>Xóa tuyến đường</h2>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+<h4>Bạn có chắc chắn muốn xóa tuyến đường này?</h4>
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Tên tuyến</dt>
+        <dd class="col-sm-10">@Model.TenTuyen</dd>
+        <dt class="col-sm-2">Điểm đi</dt>
+        <dd class="col-sm-10">@Model.DiemDi</dd>
+        <dt class="col-sm-2">Điểm đến</dt>
+        <dd class="col-sm-10">@Model.DiemDen</dd>
+        <dt class="col-sm-2">Khoảng cách</dt>
+        <dd class="col-sm-10">@Model.KhoangCach km</dd>
+        <dt class="col-sm-2">Giá vé</dt>
+        <dd class="col-sm-10">@Model.GiaVe.ToString("N0")</dd>
+    </dl>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="TuyenDuongId" />
+        <button type="submit" class="btn btn-danger">Xóa</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>

@@ -1,0 +1,113 @@
+@model DatVeXe.Models.TuyenDuong
+
+@{
+    ViewData["Title"] = "Thêm tuyến đường mới";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-route"></i>
+                        Thêm tuyến đường mới
+                    </h3>
+                </div>
+                <form asp-action="ThemTuyenDuong" method="post">
+                    <div class="card-body">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="form-group">
+                            <label asp-for="TenTuyen" class="control-label"></label>
+                            <input asp-for="TenTuyen" class="form-control" placeholder="Ví dụ: Hà Nội - Hồ Chí Minh" />
+                            <span asp-validation-for="TenTuyen" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="DiemDi" class="control-label"></label>
+                                    <input asp-for="DiemDi" class="form-control" placeholder="Ví dụ: Hà Nội" />
+                                    <span asp-validation-for="DiemDi" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="DiemDen" class="control-label" style="color: #000;"></label>
+                                    <input asp-for="DiemDen" class="form-control" placeholder="Ví dụ: Hồ Chí Minh" />
+                                    <span asp-validation-for="DiemDen" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="KhoangCach" class="control-label" style="color: #000;"></label>
+                                    <div class="input-group">
+                                        <input asp-for="KhoangCach" class="form-control" type="number" min="1" max="10000" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">km</span>
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="KhoangCach" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ThoiGianDuKien" class="control-label" style="color: #000;"></label>
+                                    <input asp-for="ThoiGianDuKien" class="form-control" type="time" />
+                                    <span asp-validation-for="ThoiGianDuKien" class="text-danger"></span>
+                                    <small class="form-text text-muted">Thời gian di chuyển dự kiến</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="GiaVe" class="control-label" style="color: #000;"></label>
+                                    <div class="input-group">
+                                        <input asp-for="GiaVe" class="form-control" type="number" min="0" step="1000" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">VNĐ</span>
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="GiaVe" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch" style="margin-top: 32px;">
+                                        <input type="checkbox" asp-for="TrangThaiHoatDong" class="custom-control-input" checked />
+                                        <label class="custom-control-label" asp-for="TrangThaiHoatDong" style="color: #000;">Tuyến đang hoạt động</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="MoTa" class="control-label" style="color: #000;"></label>
+                            <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Mô tả thêm về tuyến đường (tùy chọn)"></textarea>
+                            <span asp-validation-for="MoTa" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu tuyến đường
+                        </button>
+                        <a asp-action="QuanLyTuyenDuong" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

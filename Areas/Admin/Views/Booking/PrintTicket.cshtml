@@ -1,0 +1,11 @@
+@model dynamic
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "In vé";
+}
+<ol class="breadcrumb mb-3">
+    <li class="breadcrumb-item"><a href="/Admin">Admin</a></li>
+    <li class="breadcrumb-item"><a href="/Admin/Booking/List">Quản lý đặt vé</a></li>
+    <li class="breadcrumb-item active">In vé</li>
+</ol>
+<!-- Nội dung in vé sẽ được render động từ controller, hoặc bạn có thể render lại HTML vé tại đây nếu muốn -->

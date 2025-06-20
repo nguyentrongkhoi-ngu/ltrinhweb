@@ -1,0 +1,228 @@
+@model DatVeXe.Models.NguoiDung
+
+@{
+    ViewData["Title"] = "Thêm người dùng mới";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 style="color: #2c3e50; font-weight: 600;">
+            <i class="fas fa-user-plus text-primary me-2"></i>
+            Thêm người dùng mới
+        </h3>
+        <a href="@Url.Action("Index")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        Thông tin người dùng
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="HoTen" class="form-label fw-bold">
+                                        <i class="fas fa-user text-muted me-1"></i>
+                                        Họ tên <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên đầy đủ" />
+                                    <span asp-validation-for="HoTen" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label fw-bold">
+                                        <i class="fas fa-envelope text-muted me-1"></i>
+                                        Email <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Email" class="form-control" type="email" placeholder="example@email.com" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="MatKhau" class="form-label fw-bold">
+                                        <i class="fas fa-lock text-muted me-1"></i>
+                                        Mật khẩu <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="MatKhau" class="form-control" type="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" />
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="MatKhau" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="SoDienThoai" class="form-label fw-bold">
+                                        <i class="fas fa-phone text-muted me-1"></i>
+                                        Số điện thoại
+                                    </label>
+                                    <input asp-for="SoDienThoai" class="form-control" placeholder="0xxxxxxxxx" />
+                                    <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="GioiTinh" class="form-label fw-bold">
+                                        <i class="fas fa-venus-mars text-muted me-1"></i>
+                                        Giới tính
+                                    </label>
+                                    <select asp-for="GioiTinh" class="form-select">
+                                        <option value="">-- Chọn giới tính --</option>
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                    <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="NgaySinh" class="form-label fw-bold">
+                                        <i class="fas fa-birthday-cake text-muted me-1"></i>
+                                        Ngày sinh
+                                    </label>
+                                    <input asp-for="NgaySinh" class="form-control" type="date" />
+                                    <span asp-validation-for="NgaySinh" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="DiaChi" class="form-label fw-bold">
+                                        <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                        Địa chỉ
+                                    </label>
+                                    <textarea asp-for="DiaChi" class="form-control" rows="3" placeholder="Nhập địa chỉ đầy đủ"></textarea>
+                                    <span asp-validation-for="DiaChi" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Permissions and Status -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr>
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-cog me-2"></i>
+                                    Cài đặt quyền hạn và trạng thái
+                                </h6>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Quyền hạn</label>
+                                    <div class="form-check">
+                                        <input asp-for="LaAdmin" class="form-check-input" type="checkbox" />
+                                        <label asp-for="LaAdmin" class="form-check-label">
+                                            <i class="fas fa-user-shield text-warning me-1"></i>
+                                            Cấp quyền quản trị viên
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">
+                                        Người dùng có quyền admin sẽ có thể truy cập tất cả chức năng quản lý hệ thống
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Trạng thái tài khoản</label>
+                                    <div class="form-check">
+                                        <input asp-for="TrangThaiHoatDong" class="form-check-input" type="checkbox" checked />
+                                        <label asp-for="TrangThaiHoatDong" class="form-check-label">
+                                            <i class="fas fa-check-circle text-success me-1"></i>
+                                            Tài khoản hoạt động
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">
+                                        Chỉ những tài khoản đang hoạt động mới có thể đăng nhập và sử dụng hệ thống
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <hr>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Hủy
+                            </a>
+                            <button type="reset" class="btn btn-outline-warning">
+                                <i class="fas fa-undo me-1"></i> Đặt lại
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Tạo người dùng
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="~/js/user-management.js"></script>
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('MatKhau');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        });
+    </script>
+}
+
+<style>
+    .form-label.fw-bold {
+        color: #2c3e50;
+    }
+    
+    .card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #6CABDD;
+        box-shadow: 0 0 0 0.2rem rgba(108, 171, 221, 0.25);
+    }
+    
+    .btn {
+        border-radius: 6px;
+    }
+    
+    .form-check-input:checked {
+        background-color: #6CABDD;
+        border-color: #6CABDD;
+    }
+    
+    .input-group .btn {
+        border-radius: 0 6px 6px 0;
+    }
+</style>

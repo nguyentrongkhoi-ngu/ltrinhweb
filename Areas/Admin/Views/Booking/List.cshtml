@@ -1,0 +1,753 @@
+@model IEnumerable<DatVeXe.Models.Ve>
+@using DatVeXe.Helpers
+@{
+    ViewData["Title"] = "Quản lý đặt vé";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .search-filter-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ticket-row {
+            transition: all 0.3s ease;
+        }
+
+        .ticket-row:hover {
+            background-color: #f8f9fa !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .action-buttons .btn {
+            margin: 2px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .stats-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    @Html.AntiForgeryToken()
+
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-gradient mb-1">
+                <i class="fas fa-ticket-alt me-2"></i>
+                Quản lý đặt vé
+            </h2>
+            <p class="text-muted mb-0">Quản lý và theo dõi tất cả đơn đặt vé trong hệ thống</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Statistics" class="btn btn-admin btn-admin-primary">
+                <i class="fas fa-chart-bar me-2"></i>
+                Thống kê
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-admin btn-admin-success dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-download me-2"></i>
+                    Xuất dữ liệu
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="exportWithFilters('csv')">
+                        <i class="fas fa-file-csv me-2"></i>Xuất CSV
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="exportWithFilters('excel')">
+                        <i class="fas fa-file-excel me-2"></i>Xuất Excel
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Summary -->
+    @if (ViewBag.TotalCount != null)
+    {
+        <div class="stats-summary">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h3 class="mb-1">@ViewBag.TotalCount</h3>
+                        <small>Tổng số vé</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h3 class="mb-1">@ViewBag.CurrentPage</h3>
+                        <small>Trang hiện tại</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h3 class="mb-1">@ViewBag.TotalPages</h3>
+                        <small>Tổng số trang</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h3 class="mb-1">@(ViewBag.TotalCount != null ? Math.Min(15, (int)ViewBag.TotalCount - ((ViewBag.CurrentPage ?? 1) - 1) * 15) : 0)</h3>
+                        <small>Vé trên trang này</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Search and Filter -->
+<div class="search-filter-card mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="List" id="filterForm" class="admin-form">
+            <div class="filter-section">
+                <h6 class="text-primary mb-3">
+                    <i class="fas fa-search me-2"></i>
+                    Tìm kiếm và lọc dữ liệu
+                </h6>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Tìm kiếm</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="searchString" value="@ViewBag.CurrentFilter"
+                                   class="form-control" placeholder="Mã vé, tên khách hàng, email, SĐT..." />
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Chuyến xe</label>
+                        <select name="chuyenXeId" class="form-select">
+                            <option value="">-- Tất cả chuyến xe --</option>
+                            @if (ViewBag.ChuyenXeList != null)
+                            {
+                                @foreach (var chuyen in (IEnumerable<dynamic>)ViewBag.ChuyenXeList)
+                                {
+                                    <option value="@chuyen.ChuyenXeId" selected="@(ViewBag.SelectedChuyenXeId == chuyen.ChuyenXeId)">
+                                        @chuyen.TenChuyenXe
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select name="trangThaiVe" class="form-select">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            @if (ViewBag.TrangThaiVeList != null)
+                            {
+                                @foreach (var trangThai in (IEnumerable<dynamic>)ViewBag.TrangThaiVeList)
+                                {
+                                    <option value="@trangThai.Value" selected="@(ViewBag.SelectedTrangThaiVe == trangThai.Value)">
+                                        @trangThai.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Từ ngày</label>
+                        <input type="date" name="tuNgay" value="@ViewBag.TuNgayFilter" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-3">
+                        <label class="form-label">Đến ngày</label>
+                        <input type="date" name="denNgay" value="@ViewBag.DenNgayFilter" class="form-control" />
+                    </div>
+
+                    <div class="col-md-9 d-flex align-items-end">
+                        <div class="d-flex gap-2 w-100">
+                            <button type="submit" class="btn btn-admin btn-admin-primary">
+                                <i class="fas fa-search me-2"></i>
+                                Tìm kiếm
+                            </button>
+                            <a asp-action="List" class="btn btn-outline-secondary">
+                                <i class="fas fa-undo me-2"></i>
+                                Đặt lại
+                            </a>
+                            <button type="button" class="btn btn-outline-info" onclick="toggleAdvancedFilter()">
+                                <i class="fas fa-cog me-2"></i>
+                                Nâng cao
+                            </button>
+                            <div class="ms-auto">
+                                <small class="text-muted">
+                                    Tìm thấy <strong>@ViewBag.TotalCount</strong> kết quả
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Filter Section (Hidden by default) -->
+                <div id="advancedFilter" class="mt-3" style="display: none;">
+                    <hr>
+                    <h6 class="text-secondary mb-3">
+                        <i class="fas fa-filter me-2"></i>
+                        Bộ lọc nâng cao
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Sắp xếp theo</label>
+                            <select name="sortBy" class="form-select">
+                                <option value="NgayDat">Ngày đặt (mới nhất)</option>
+                                <option value="NgayDat_asc">Ngày đặt (cũ nhất)</option>
+                                <option value="GiaVe">Giá vé (cao nhất)</option>
+                                <option value="GiaVe_asc">Giá vé (thấp nhất)</option>
+                                <option value="TenKhach">Tên khách hàng (A-Z)</option>
+                                <option value="TenKhach_desc">Tên khách hàng (Z-A)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Số vé trên trang</label>
+                            <select name="pageSize" class="form-select">
+                                <option value="15">15 vé</option>
+                                <option value="25">25 vé</option>
+                                <option value="50">50 vé</option>
+                                <option value="100">100 vé</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Lọc theo giá vé</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="number" name="giaMin" class="form-control" placeholder="Giá tối thiểu">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" name="giaMax" class="form-control" placeholder="Giá tối đa">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tickets Table -->
+<div class="admin-table">
+    <div class="card-header bg-gradient text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-list me-2"></i>
+                Danh sách vé (@ViewBag.TotalCount)
+            </h5>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-light" onclick="selectAllTickets()">
+                    <i class="fas fa-check-square me-1"></i>
+                    Chọn tất cả
+                </button>
+                <button class="btn btn-sm btn-warning" onclick="bulkUpdateStatus()" disabled id="bulkUpdateBtn">
+                    <i class="fas fa-edit me-1"></i>
+                    Cập nhật hàng loạt
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="admin-table-header">
+                        <tr>
+                            <th width="40">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                            </th>
+                            <th>Mã vé</th>
+                            <th>Khách hàng</th>
+                            <th>Chuyến xe</th>
+                            <th>Ghế</th>
+                            <th>Giá vé</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày đặt</th>
+                            <th width="200">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ve in Model)
+                        {
+                            <tr id="ticket-row-@ve.VeId" class="ticket-row">
+                                <td>
+                                    <input type="checkbox" class="ticket-checkbox" value="@ve.VeId" onchange="updateBulkActions()">
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong class="text-primary">@ve.MaVe</strong>
+                                        @if (ve.ThanhToans != null && ve.ThanhToans.Any(t => t.TrangThai == DatVeXe.Models.TrangThaiThanhToan.ThanhCong))
+                                        {
+                                            <br><small class="text-success"><i class="fas fa-check-circle"></i> Đã thanh toán</small>
+                                        }
+                                        else
+                                        {
+                                            <br><small class="text-warning"><i class="fas fa-clock"></i> Chưa thanh toán</small>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        @{
+                                            var tenKhach = !string.IsNullOrEmpty(ve.TenKhach) ? ve.TenKhach : ve.NguoiDung?.HoTen;
+                                            var soDienThoai = !string.IsNullOrEmpty(ve.SoDienThoai) ? ve.SoDienThoai : ve.NguoiDung?.SoDienThoai;
+                                            var email = ve.Email ?? ve.NguoiDung?.Email;
+                                        }
+                                        <strong>@tenKhach</strong>
+                                        @if (!string.IsNullOrEmpty(email))
+                                        {
+                                            <br><small class="text-muted"><i class="fas fa-envelope"></i> @email</small>
+                                        }
+                                        @if (!string.IsNullOrEmpty(soDienThoai))
+                                        {
+                                            <br><small class="text-muted"><i class="fas fa-phone"></i> @soDienThoai</small>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>@ve.ChuyenXe?.TuyenDuong?.DiemDi → @ve.ChuyenXe?.TuyenDuong?.DiemDen</strong>
+                                        <br><small class="text-muted"><i class="fas fa-calendar"></i> @ve.ChuyenXe?.NgayKhoiHanh.ToString("dd/MM/yyyy HH:mm")</small>
+                                        @if (!string.IsNullOrEmpty(ve.ChuyenXe?.Xe?.BienSoXe))
+                                        {
+                                            <br><small class="text-info"><i class="fas fa-bus"></i> @ve.ChuyenXe.Xe.BienSoXe</small>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(ve.ChoNgoi?.SoGhe))
+                                    {
+                                        <span class="status-badge bg-info text-white">
+                                            <i class="fas fa-chair"></i> @ve.ChoNgoi.SoGhe
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa chọn</span>
+                                    }
+                                </td>
+                                <td>
+                                    <strong class="text-success">@ve.GiaVe.ToString("N0") VNĐ</strong>
+                                </td>
+                                <td>
+                                    <span class="status-badge bg-@(ViewHelper.GetStatusBadgeClass(ve.VeTrangThai))"
+                                          id="status-badge-@ve.VeId">
+                                        @ViewHelper.GetStatusText(ve.VeTrangThai)
+                                    </span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>@ve.NgayDat.ToString("dd/MM/yyyy")</strong>
+                                        <br><small class="text-muted">@ve.NgayDat.ToString("HH:mm")</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a asp-action="Detail" asp-route-id="@ve.VeId"
+                                           class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="PrintTicket" asp-route-id="@ve.VeId"
+                                           class="btn btn-sm btn-outline-secondary" title="In vé" target="_blank">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                        @if (ve.VeTrangThai != DatVeXe.Models.TrangThaiVe.DaHuy)
+                                        {
+                                            <div class="dropdown d-inline">
+                                                <button class="btn btn-sm btn-outline-warning dropdown-toggle" type="button"
+                                                        data-bs-toggle="dropdown" title="Cập nhật trạng thái">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    @foreach (var status in Enum.GetValues<DatVeXe.Models.TrangThaiVe>())
+                                                    {
+                                                        @if (status != ve.VeTrangThai)
+                                                        {
+                                                            <li>
+                                                                <a class="dropdown-item" href="#"
+                                                                   onclick="updateStatus(@ve.VeId, '@status')">
+                                                                    <i class="fas fa-circle text-@(ViewHelper.GetStatusBadgeClass(status)) me-2"></i>
+                                                                    @ViewHelper.GetStatusText(status)
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                        @if (ve.VeTrangThai == DatVeXe.Models.TrangThaiVe.DaHuy)
+                                        {
+                                            <button class="btn btn-sm btn-outline-danger" disabled title="Vé đã hủy">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Không tìm thấy vé nào</h5>
+                <p class="text-muted">Thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác</p>
+                <a asp-action="List" class="btn btn-primary">
+                    <i class="fas fa-undo me-2"></i>
+                    Đặt lại bộ lọc
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Pagination -->
+@if (ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Phân trang vé" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@GetPageUrl(ViewBag.CurrentPage - 1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            }
+
+            @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@GetPageUrl(i)">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@GetPageUrl(ViewBag.CurrentPage + 1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@functions {
+    private string GetPageUrl(int page)
+    {
+        return Url.Action("List", new {
+            page = page,
+            searchString = ViewBag.CurrentFilter,
+            chuyenXeId = ViewBag.SelectedChuyenXeId,
+            trangThaiVe = ViewBag.SelectedTrangThaiVe,
+            tuNgay = ViewBag.TuNgayFilter,
+            denNgay = ViewBag.DenNgayFilter
+        });
+    }
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[title]').tooltip();
+
+            // Auto-submit form on filter change
+            $('#filterForm select, #filterForm input[type="date"]').on('change', function() {
+                if ($(this).attr('name') !== 'searchString') {
+                    $('#filterForm').submit();
+                }
+            });
+
+            // Search on Enter key
+            $('input[name="searchString"]').on('keypress', function(e) {
+                if (e.which === 13) {
+                    $('#filterForm').submit();
+                }
+            });
+        });
+
+        function updateStatus(veId, trangThai) {
+            const statusText = getStatusText(trangThai);
+
+            if (confirm(`Bạn có chắc chắn muốn cập nhật trạng thái vé thành "${statusText}"?`)) {
+                // Show loading
+                const btn = event.target.closest('.dropdown');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+                $.post('@Url.Action("UpdateStatus")', {
+                    veId: veId,
+                    trangThai: trangThai,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                })
+                .done(function(data) {
+                    if (data.success) {
+                        // Update badge
+                        const badge = $('#status-badge-' + veId);
+                        badge.removeClass().addClass('status-badge bg-' + getStatusBadgeClass(trangThai));
+                        badge.text(data.newStatus);
+
+                        // Update row styling
+                        const row = $('#ticket-row-' + veId);
+                        row.addClass('table-success');
+
+                        showToast(data.message, 'success');
+
+                        // Reload page after 2 seconds to refresh data
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        showToast(data.message, 'error');
+                        btn.innerHTML = originalHtml;
+                    }
+                })
+                .fail(function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || 'Có lỗi xảy ra khi cập nhật trạng thái vé';
+                    showToast(errorMsg, 'error');
+                    btn.innerHTML = originalHtml;
+                });
+            }
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.ticket-checkbox');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+
+            updateBulkActions();
+        }
+
+        function selectAllTickets() {
+            const selectAll = document.getElementById('selectAll');
+            selectAll.checked = true;
+            toggleSelectAll();
+        }
+
+        function updateBulkActions() {
+            const checkedBoxes = document.querySelectorAll('.ticket-checkbox:checked');
+            const bulkBtn = document.getElementById('bulkUpdateBtn');
+
+            if (checkedBoxes.length > 0) {
+                bulkBtn.disabled = false;
+                bulkBtn.innerHTML = `<i class="fas fa-edit me-1"></i> Cập nhật ${checkedBoxes.length} vé`;
+            } else {
+                bulkBtn.disabled = true;
+                bulkBtn.innerHTML = '<i class="fas fa-edit me-1"></i> Cập nhật hàng loạt';
+            }
+        }
+
+        function bulkUpdateStatus() {
+            const checkedBoxes = document.querySelectorAll('.ticket-checkbox:checked');
+            const veIds = Array.from(checkedBoxes).map(cb => cb.value);
+
+            if (veIds.length === 0) {
+                showToast('Vui lòng chọn ít nhất một vé', 'warning');
+                return;
+            }
+
+            // Show modal for status selection
+            showBulkUpdateModal(veIds);
+        }
+
+        function showBulkUpdateModal(veIds) {
+            const modal = `
+                <div class="modal fade" id="bulkUpdateModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Cập nhật trạng thái hàng loạt</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Bạn đang cập nhật trạng thái cho <strong>${veIds.length}</strong> vé.</p>
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn trạng thái mới:</label>
+                                    <select class="form-select" id="bulkStatus">
+                                        <option value="DaThanhToan">Đã thanh toán</option>
+                                        <option value="DaSuDung">Đã sử dụng</option>
+                                        <option value="DaHoanThanh">Đã hoàn thành</option>
+                                        <option value="DaHuy">Đã hủy</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ghi chú (tùy chọn):</label>
+                                    <textarea class="form-control" id="bulkNote" rows="3" placeholder="Nhập ghi chú..."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="button" class="btn btn-primary" onclick="executeBulkUpdate(${JSON.stringify(veIds)})">
+                                    Cập nhật
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal
+            $('#bulkUpdateModal').remove();
+
+            // Add and show new modal
+            $('body').append(modal);
+            $('#bulkUpdateModal').modal('show');
+        }
+
+        function executeBulkUpdate(veIds) {
+            const status = document.getElementById('bulkStatus').value;
+            const note = document.getElementById('bulkNote').value;
+
+            // TODO: Implement bulk update API call
+            showToast('Chức năng cập nhật hàng loạt đang được phát triển', 'info');
+            $('#bulkUpdateModal').modal('hide');
+        }
+
+        function toggleAdvancedFilter() {
+            const advancedFilter = document.getElementById('advancedFilter');
+            const isVisible = advancedFilter.style.display !== 'none';
+
+            if (isVisible) {
+                advancedFilter.style.display = 'none';
+            } else {
+                advancedFilter.style.display = 'block';
+            }
+        }
+
+        function exportWithFilters(format = 'csv') {
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+            formData.append('format', format);
+            const params = new URLSearchParams(formData);
+
+            // Show loading
+            showToast('Đang chuẩn bị file xuất...', 'info');
+
+            window.open('@Url.Action("Export")?' + params.toString(), '_blank');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'DaDat': 'Đã đặt',
+                'DaThanhToan': 'Đã thanh toán',
+                'DaSuDung': 'Đã sử dụng',
+                'DaHuy': 'Đã hủy',
+                'DaHoanThanh': 'Đã hoàn thành',
+                'DaHoanTien': 'Đã hoàn tiền'
+            };
+            return statusMap[status] || 'Không xác định';
+        }
+
+        function getStatusBadgeClass(status) {
+            const classMap = {
+                'DaDat': 'warning',
+                'DaThanhToan': 'info',
+                'DaSuDung': 'primary',
+                'DaHuy': 'danger',
+                'DaHoanThanh': 'success',
+                'DaHoanTien': 'secondary'
+            };
+            return classMap[status] || 'light';
+        }
+
+        function showToast(message, type) {
+            const toastClass = {
+                'success': 'bg-success',
+                'error': 'bg-danger',
+                'warning': 'bg-warning',
+                'info': 'bg-info'
+            }[type] || 'bg-secondary';
+
+            const icon = {
+                'success': 'fas fa-check-circle',
+                'error': 'fas fa-exclamation-circle',
+                'warning': 'fas fa-exclamation-triangle',
+                'info': 'fas fa-info-circle'
+            }[type] || 'fas fa-bell';
+
+            const toast = $(`
+                <div class="toast align-items-center text-white ${toastClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="${icon} me-2"></i>${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `);
+
+            if (!$('#toast-container').length) {
+                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>');
+            }
+
+            $('#toast-container').append(toast);
+            toast.toast('show');
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+    </script>
+}
