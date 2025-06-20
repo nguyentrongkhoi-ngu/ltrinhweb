@@ -1,0 +1,217 @@
+@model DatVeXe.Models.KhuyenMai
+
+@{
+    ViewData["Title"] = "Chỉnh sửa khuyến mãi";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Chỉnh sửa khuyến mãi</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "KhuyenMai")">Quản lý khuyến mãi</a></li>
+                        <li class="breadcrumb-item active">Chỉnh sửa</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-edit mr-2"></i>
+                        Thông tin khuyến mãi
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" class="row">
+                        <div asp-validation-summary="ModelOnly" class="text-danger col-12 mb-3"></div>
+                        
+                        <input type="hidden" asp-for="KhuyenMaiId" />
+                        <input type="hidden" asp-for="NgayTao" />
+                        <input type="hidden" asp-for="SoLuongDaSuDung" />
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="TenKhuyenMai" class="control-label">Tên khuyến mãi <span class="text-danger">*</span></label>
+                                <input asp-for="TenKhuyenMai" class="form-control" />
+                                <span asp-validation-for="TenKhuyenMai" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="MaKhuyenMai" class="control-label">Mã khuyến mãi <span class="text-danger">*</span></label>
+                                <input asp-for="MaKhuyenMai" class="form-control" style="text-transform: uppercase;" />
+                                <span asp-validation-for="MaKhuyenMai" class="text-danger"></span>
+                                <small class="form-text text-muted">Mã không được trùng với mã khuyến mãi khác</small>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="MoTa" class="control-label">Mô tả</label>
+                                <textarea asp-for="MoTa" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="MoTa" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="LoaiKhuyenMai" class="control-label">Loại khuyến mãi <span class="text-danger">*</span></label>                                <select asp-for="LoaiKhuyenMai" class="form-control" id="loaiKhuyenMai">
+                                    <option value="">-- Chọn loại khuyến mãi --</option>
+                                    <option value="@LoaiKhuyenMai.GiamPhanTram">Giảm theo phần trăm (%)</option>
+                                    <option value="@LoaiKhuyenMai.GiamSoTien">Giảm số tiền cố định (VNĐ)</option>
+                                    <option value="@LoaiKhuyenMai.MienPhi">Miễn phí</option>
+                                </select>
+                                <span asp-validation-for="LoaiKhuyenMai" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="GiaTri" class="control-label">Giá trị <span class="text-danger">*</span></label>
+                                <input asp-for="GiaTri" class="form-control" type="number" step="0.01" min="0" />
+                                <span asp-validation-for="GiaTri" class="text-danger"></span>
+                                <small class="form-text text-muted" id="giaTriHelp">Nhập % (0-100) hoặc số tiền tùy theo loại khuyến mãi</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="GiaTriToiDa" class="control-label">Giá trị giảm tối đa (VNĐ)</label>
+                                <input asp-for="GiaTriToiDa" class="form-control" type="number" min="0" />
+                                <span asp-validation-for="GiaTriToiDa" class="text-danger"></span>
+                                <small class="form-text text-muted">Áp dụng cho loại giảm theo phần trăm</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="GiaTriDonHangToiThieu" class="control-label">Giá trị đơn hàng tối thiểu (VNĐ)</label>
+                                <input asp-for="GiaTriDonHangToiThieu" class="form-control" type="number" min="0" />
+                                <span asp-validation-for="GiaTriDonHangToiThieu" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="NgayBatDau" class="control-label">Ngày bắt đầu <span class="text-danger">*</span></label>
+                                <input asp-for="NgayBatDau" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="NgayBatDau" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="NgayKetThuc" class="control-label">Ngày kết thúc <span class="text-danger">*</span></label>
+                                <input asp-for="NgayKetThuc" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="NgayKetThuc" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="SoLuongToiDa" class="control-label">Số lượng tối đa</label>
+                                <input asp-for="SoLuongToiDa" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="SoLuongToiDa" class="text-danger"></span>
+                                <small class="form-text text-muted">Để trống nếu không giới hạn</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="SoLanSuDungToiDa" class="control-label">Số lần sử dụng tối đa/người</label>
+                                <input asp-for="SoLanSuDungToiDa" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="SoLanSuDungToiDa" class="text-danger"></span>
+                                <small class="form-text text-muted">Để trống nếu không giới hạn</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="TrangThaiHoatDong" />
+                                    <label class="form-check-label" asp-for="TrangThaiHoatDong">
+                                        Kích hoạt khuyến mãi
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save mr-2"></i>Cập nhật
+                                </button>
+                                <a class="btn btn-secondary" asp-action="Index">
+                                    <i class="fas fa-arrow-left mr-2"></i>Quay lại
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Xử lý thay đổi loại khuyến mãi
+            $('#loaiKhuyenMai').change(function() {
+                var loaiKhuyenMai = $(this).val();
+                var giaTriHelp = $('#giaTriHelp');
+                  if (loaiKhuyenMai === '@LoaiKhuyenMai.GiamPhanTram') {
+                    giaTriHelp.text('Nhập phần trăm giảm (0-100)');
+                    $('input[name="GiaTri"]').attr('max', '100');
+                } else if (loaiKhuyenMai === '@LoaiKhuyenMai.GiamSoTien') {
+                    giaTriHelp.text('Nhập số tiền giảm (VNĐ)');
+                    $('input[name="GiaTri"]').removeAttr('max');
+                } else {
+                    giaTriHelp.text('Nhập % (0-100) hoặc số tiền tùy theo loại khuyến mãi');
+                }
+            });
+
+            // Trigger change event on page load
+            $('#loaiKhuyenMai').trigger('change');
+
+            // Xử lý định dạng mã khuyến mãi viết hoa
+            $('input[name="MaKhuyenMai"]').on('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+
+            // Validation ngày tháng
+            $('input[name="NgayBatDau"], input[name="NgayKetThuc"]').change(function() {
+                var ngayBatDau = new Date($('input[name="NgayBatDau"]').val());
+                var ngayKetThuc = new Date($('input[name="NgayKetThuc"]').val());
+                
+                if (ngayBatDau && ngayKetThuc && ngayBatDau >= ngayKetThuc) {
+                    alert('Ngày kết thúc phải sau ngày bắt đầu');
+                    $(this).focus();
+                }
+            });
+        });
+    </script>
+}

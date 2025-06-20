@@ -1,0 +1,308 @@
+@model DatVeXe.Models.ChuyenXe
+@{
+    ViewData["Title"] = "Sửa chuyến xe";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">
+                        <i class="fas fa-edit text-primary"></i>
+                        Sửa chuyến xe
+                    </h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Trang chủ
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="ChuyenXe" asp-action="Index">
+                                <i class="fas fa-bus"></i> Quản lý chuyến xe
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">Sửa chuyến xe</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title text-dark">
+                                <i class="fas fa-edit"></i>
+                                Thông tin chuyến xe
+                            </h3>
+                        </div>
+
+                        <form asp-action="Edit" method="post" id="editChuyenXeForm">
+                            <div class="card-body">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="display:none;"></div>
+
+                                <input type="hidden" asp-for="ChuyenXeId" />
+                                <input type="hidden" asp-for="NgayTao" />
+                                <input type="hidden" asp-for="TrangThai" />
+                                <input type="hidden" asp-for="TrangThaiChuyenXe" />
+                                <input type="hidden" asp-for="TrangThaiDuyet" />
+                                <input type="hidden" asp-for="NgayDuyet" />
+                                <input type="hidden" asp-for="LyDoTuChoi" />
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="XeId" class="form-label text-dark">
+                                                <i class="fas fa-bus text-primary"></i>
+                                                Chọn xe <span class="text-danger">*</span>
+                                            </label>
+                                            <select asp-for="XeId" class="form-control select2"
+                                                    asp-items="@(new SelectList(ViewBag.Xes, "XeId", "BienSo"))"
+                                                    data-placeholder="-- Chọn xe --">
+                                                <option value="">-- Chọn xe --</option>
+                                            </select>
+                                            <span asp-validation-for="XeId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="TuyenDuongId" class="form-label text-dark">
+                                                <i class="fas fa-route text-success"></i>
+                                                Tuyến đường
+                                            </label>
+                                            <select asp-for="TuyenDuongId" class="form-control select2"
+                                                    asp-items="@(new SelectList(ViewBag.TuyenDuongs, "TuyenDuongId", "TenTuyen"))"
+                                                    data-placeholder="-- Chọn tuyến đường --">
+                                                <option value="">-- Chọn tuyến đường --</option>
+                                            </select>
+                                            <span asp-validation-for="TuyenDuongId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="DiemDi" class="form-label text-dark">
+                                                <i class="fas fa-map-marker-alt text-info"></i>
+                                                Điểm đi <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="DiemDi" class="form-control"
+                                                   placeholder="Nhập điểm đi" />
+                                            <span asp-validation-for="DiemDi" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="DiemDen" class="form-label text-dark">
+                                                <i class="fas fa-map-marker-alt text-warning"></i>
+                                                Điểm đến <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="DiemDen" class="form-control"
+                                                   placeholder="Nhập điểm đến" />
+                                            <span asp-validation-for="DiemDen" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="NgayKhoiHanh" class="form-label text-dark">
+                                                <i class="fas fa-calendar-alt text-primary"></i>
+                                                Ngày khởi hành <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="NgayKhoiHanh" class="form-control"
+                                                   type="datetime-local" />
+                                            <span asp-validation-for="NgayKhoiHanh" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="ThoiGianDi" class="form-label text-dark">
+                                                <i class="fas fa-clock text-success"></i>
+                                                Thời gian đi <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="ThoiGianDi" class="form-control"
+                                                   type="time" />
+                                            <span asp-validation-for="ThoiGianDi" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Gia" class="form-label text-dark">
+                                                <i class="fas fa-money-bill-wave text-success"></i>
+                                                Giá vé (VNĐ) <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="Gia" class="form-control"
+                                                   type="number" min="0" step="1000"
+                                                   placeholder="Nhập giá vé" />
+                                            <span asp-validation-for="Gia" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="TaiXeId" class="form-label text-dark">
+                                                <i class="fas fa-user text-info"></i>
+                                                Tài xế
+                                            </label>
+                                            <select asp-for="TaiXeId" class="form-control select2"
+                                                    asp-items="@(new SelectList(ViewBag.TaiXes, "TaiXeId", "HoTen"))"
+                                                    data-placeholder="-- Chọn tài xế --">
+                                                <option value="">-- Chọn tài xế --</option>
+                                            </select>
+                                            <span asp-validation-for="TaiXeId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="GhiChu" class="form-label text-dark">
+                                        <i class="fas fa-sticky-note text-warning"></i>
+                                        Ghi chú
+                                    </label>
+                                    <textarea asp-for="GhiChu" class="form-control" rows="3"
+                                              placeholder="Nhập ghi chú (nếu có)"></textarea>
+                                    <span asp-validation-for="GhiChu" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            <i class="fas fa-save"></i>
+                                            Cập nhật chuyến xe
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a asp-area="Admin" asp-controller="ChuyenXe" asp-action="Index"
+                                           class="btn btn-secondary btn-block">
+                                            <i class="fas fa-times"></i>
+                                            Hủy bỏ
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            // Form validation
+            $('#editChuyenXeForm').on('submit', function(e) {
+                var isValid = true;
+                var errorMessages = [];
+
+                // Validate required fields
+                if (!$('#XeId').val()) {
+                    errorMessages.push('Vui lòng chọn xe');
+                    isValid = false;
+                }
+
+                if (!$('#DiemDi').val().trim()) {
+                    errorMessages.push('Vui lòng nhập điểm đi');
+                    isValid = false;
+                }
+
+                if (!$('#DiemDen').val().trim()) {
+                    errorMessages.push('Vui lòng nhập điểm đến');
+                    isValid = false;
+                }
+
+                if (!$('#NgayKhoiHanh').val()) {
+                    errorMessages.push('Vui lòng chọn ngày khởi hành');
+                    isValid = false;
+                }
+
+                if (!$('#ThoiGianDi').val()) {
+                    errorMessages.push('Vui lòng chọn thời gian đi');
+                    isValid = false;
+                }
+
+                if (!$('#Gia').val() || parseFloat($('#Gia').val()) <= 0) {
+                    errorMessages.push('Vui lòng nhập giá vé hợp lệ');
+                    isValid = false;
+                }
+
+                // Check if departure date is in the future
+                var departureDate = new Date($('#NgayKhoiHanh').val());
+                var now = new Date();
+                if (departureDate <= now) {
+                    errorMessages.push('Ngày khởi hành phải sau thời điểm hiện tại');
+                    isValid = false;
+                }
+
+                // Check if departure and destination are different
+                if ($('#DiemDi').val().trim().toLowerCase() === $('#DiemDen').val().trim().toLowerCase()) {
+                    errorMessages.push('Điểm đi và điểm đến không được giống nhau');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    var alertHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                        '<h6><i class="fas fa-exclamation-triangle"></i> Có lỗi xảy ra:</h6>' +
+                        '<ul class="mb-0">';
+
+                    errorMessages.forEach(function(message) {
+                        alertHtml += '<li>' + message + '</li>';
+                    });
+
+                    alertHtml += '</ul>' +
+                        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                        '<span aria-hidden="true">&times;</span>' +
+                        '</button>' +
+                        '</div>';
+
+                    $('.card-body').prepend(alertHtml);
+                    $('html, body').animate({
+                        scrollTop: $('.alert').offset().top - 100
+                    }, 500);
+                }
+            });
+
+            // Format price input
+            $('#Gia').on('input', function() {
+                var value = $(this).val().replace(/[^0-9]/g, '');
+                if (value) {
+                    $(this).val(parseInt(value));
+                }
+            });
+
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut();
+            }, 5000);
+        });
+    </script>
+}

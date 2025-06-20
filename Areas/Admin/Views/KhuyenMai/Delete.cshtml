@@ -1,0 +1,146 @@
+@model DatVeXe.Models.KhuyenMai
+
+@{
+    ViewData["Title"] = "Xóa khuyến mãi";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Xóa khuyến mãi</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "KhuyenMai")">Quản lý khuyến mãi</a></li>
+                        <li class="breadcrumb-item active">Xóa</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header bg-danger">
+                    <h3 class="card-title text-white">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Xác nhận xóa khuyến mãi
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5><i class="icon fas fa-exclamation-triangle"></i> Cảnh báo!</h5>
+                        Bạn có chắc chắn muốn xóa khuyến mãi này? Hành động này không thể hoàn tác.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Tên khuyến mãi:</dt>
+                                <dd class="col-sm-8">@Html.DisplayFor(model => model.TenKhuyenMai)</dd>
+
+                                <dt class="col-sm-4">Mã khuyến mãi:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge badge-info">@Html.DisplayFor(model => model.MaKhuyenMai)</span>
+                                </dd>                                <dt class="col-sm-4">Loại khuyến mãi:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.LoaiKhuyenMai == LoaiKhuyenMai.GiamPhanTram)
+                                    {
+                                        <span class="badge badge-success">Giảm theo phần trăm</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-primary">Giảm số tiền cố định</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">Giá trị:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.LoaiKhuyenMai == LoaiKhuyenMai.GiamPhanTram)
+                                    {
+                                        <text>@Model.GiaTri%</text>
+                                    }
+                                    else
+                                    {
+                                        <text>@Model.GiaTri.ToString("N0") VNĐ</text>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">Trạng thái:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.TrangThaiHoatDong)
+                                    {
+                                        <span class="badge badge-success">Đang hoạt động</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">Tạm dừng</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Ngày bắt đầu:</dt>
+                                <dd class="col-sm-8">@Model.NgayBatDau.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                                <dt class="col-sm-4">Ngày kết thúc:</dt>
+                                <dd class="col-sm-8">@Model.NgayKetThuc.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                                @if (Model.SoLuongToiDa.HasValue)
+                                {
+                                    <dt class="col-sm-4">Số lượng:</dt>
+                                    <dd class="col-sm-8">@Model.SoLuongDaSuDung/@Model.SoLuongToiDa</dd>
+                                }
+
+                                @if (Model.SoLanSuDungToiDa.HasValue)
+                                {
+                                    <dt class="col-sm-4">Sử dụng tối đa:</dt>
+                                    <dd class="col-sm-8">@Model.SoLanSuDungToiDa lần/người</dd>
+                                }
+
+                                <dt class="col-sm-4">Ngày tạo:</dt>
+                                <dd class="col-sm-8">@Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                                @if (Model.NgayCapNhat.HasValue)
+                                {
+                                    <dt class="col-sm-4">Cập nhật cuối:</dt>
+                                    <dd class="col-sm-8">@Model.NgayCapNhat.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+                                }
+                            </dl>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.MoTa))
+                    {
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>Mô tả:</h6>
+                                <p class="text-muted">@Model.MoTa</p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <form asp-action="Delete" method="post" class="d-inline">
+                                <input type="hidden" asp-for="KhuyenMaiId" />
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa khuyến mãi này?')">
+                                    <i class="fas fa-trash mr-2"></i>Xóa khuyến mãi
+                                </button>
+                            </form>
+                            <a class="btn btn-secondary ml-2" asp-action="Index">
+                                <i class="fas fa-arrow-left mr-2"></i>Hủy bỏ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

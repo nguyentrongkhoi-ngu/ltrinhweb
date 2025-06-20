@@ -1,0 +1,181 @@
+@model DatVeXe.Models.ChuyenXe
+@{
+    ViewData["Title"] = "Thêm chuyến xe mới";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="text-white mb-1">
+                    <i class="fas fa-plus-circle text-primary me-2"></i>
+                    Thêm chuyến xe mới
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="text-decoration-none">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-action="Index" class="text-decoration-none">Quản lý chuyến xe</a>
+                        </li>
+                        <li class="breadcrumb-item active">Thêm mới</li>
+                    </ol>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Quay lại danh sách
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form -->
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-bus me-2"></i>
+                    Thông tin chuyến xe mới
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="XeId" class="form-label fw-bold">
+                                    <i class="fas fa-bus me-1"></i>
+                                    Xe *
+                                </label>
+                                <select asp-for="XeId" class="form-select" asp-items="@(new SelectList(ViewBag.Xes, "XeId", "BienSoXe"))">
+                                    <option value="">-- Chọn xe --</option>
+                                </select>
+                                <span asp-validation-for="XeId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TuyenDuongId" class="form-label fw-bold">
+                                    <i class="fas fa-route me-1"></i>
+                                    Tuyến đường *
+                                </label>
+                                <select asp-for="TuyenDuongId" class="form-select" asp-items="@(new SelectList(ViewBag.TuyenDuongs, "TuyenDuongId", "TenTuyen"))">
+                                    <option value="">-- Chọn tuyến đường --</option>
+                                </select>
+                                <span asp-validation-for="TuyenDuongId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TaiXeId" class="form-label fw-bold">
+                                    <i class="fas fa-user me-1"></i>
+                                    Tài xế
+                                </label>
+                                <select asp-for="TaiXeId" class="form-select" asp-items="@(new SelectList(ViewBag.TaiXes, "TaiXeId", "HoTen"))">
+                                    <option value="">-- Chọn tài xế --</option>
+                                </select>
+                                <span asp-validation-for="TaiXeId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Gia" class="form-label fw-bold">
+                                    <i class="fas fa-money-bill-wave me-1"></i>
+                                    Giá vé *
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="Gia" type="number" min="0" step="1000" class="form-control" placeholder="0" />
+                                    <span class="input-group-text">VNĐ</span>
+                                </div>
+                                <span asp-validation-for="Gia" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="NgayKhoiHanh" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Ngày khởi hành *
+                                </label>
+                                <input asp-for="NgayKhoiHanh" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="NgayKhoiHanh" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ThoiGianDi" class="form-label fw-bold">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Thời gian đi *
+                                </label>
+                                <input asp-for="ThoiGianDi" class="form-control" type="time" />
+                                <span asp-validation-for="ThoiGianDi" class="text-danger"></span>
+                                <div class="form-text">Giờ khởi hành của chuyến xe</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="GhiChu" class="form-label fw-bold">
+                            <i class="fas fa-sticky-note me-1"></i>
+                            Ghi chú
+                        </label>
+                        <textarea asp-for="GhiChu" class="form-control" rows="3" placeholder="Ghi chú thêm về chuyến xe (tùy chọn)"></textarea>
+                        <span asp-validation-for="GhiChu" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-end">
+                        <a asp-action="Index" class="btn btn-secondary me-2">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Tạo chuyến xe
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function() {
+            // Set minimum date to today
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+            var minDate = yyyy + '-' + mm + '-' + dd + 'T00:00';
+
+            $('input[name="NgayKhoiHanh"]').attr('min', minDate);
+
+            // Auto-fill price when route is selected
+            $('#TuyenDuongId').change(function() {
+                var selectedOption = $(this).find('option:selected');
+                if (selectedOption.val()) {
+                    // You can add AJAX call here to get route price
+                    console.log('Route selected:', selectedOption.text());
+                }
+            });
+        });
+    </script>
+}

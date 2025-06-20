@@ -1,0 +1,287 @@
+@{
+    ViewData["Title"] = "Tổng quan quản lý khuyến mãi";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #2c3e50; font-weight: 600;">
+            <i class="fas fa-tags" style="color: #e74c3c;"></i>
+            Tổng quan quản lý khuyến mãi
+        </h2>
+    </div>
+
+    <!-- Thống kê nhanh -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@ViewBag.TongKhuyenMai</h4>
+                            <p class="card-text">Tổng khuyến mãi</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-tags fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@ViewBag.KhuyenMaiHoatDong</h4>
+                            <p class="card-text">Đang hoạt động</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@ViewBag.TongLuotSuDung</h4>
+                            <p class="card-text">Lượt sử dụng hôm nay</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@(((decimal)ViewBag.TongTienTietKiem).ToString("N0"))</h4>
+                            <p class="card-text">Tiết kiệm hôm nay (VNĐ)</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-money-bill-wave fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu chức năng -->
+    <div class="row">
+        <!-- Dashboard -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-chart-line fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Dashboard Thống Kê</h5>
+                    <p class="card-text">Xem tổng quan hiệu quả các chương trình khuyến mãi với biểu đồ và báo cáo chi tiết.</p>
+                    <a asp-action="Dashboard" class="btn btn-primary">
+                        <i class="fas fa-chart-line"></i> Xem Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quản lý khuyến mãi -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-list fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">Quản Lý Khuyến Mãi</h5>
+                    <p class="card-text">Tạo, chỉnh sửa, xóa và quản lý trạng thái các chương trình khuyến mãi.</p>
+                    <div class="d-grid gap-2">
+                        <a asp-action="Index" class="btn btn-success">
+                            <i class="fas fa-list"></i> Danh sách
+                        </a>
+                        <a asp-action="Create" class="btn btn-outline-success">
+                            <i class="fas fa-plus"></i> Tạo mới
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lịch sử sử dụng -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-history fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">Lịch Sử Sử Dụng</h5>
+                    <p class="card-text">Theo dõi chi tiết việc sử dụng mã khuyến mãi của khách hàng.</p>
+                    <a asp-action="LichSuSuDung" class="btn btn-warning">
+                        <i class="fas fa-history"></i> Xem lịch sử
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tìm kiếm nâng cao -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-search fa-3x text-info"></i>
+                    </div>
+                    <h5 class="card-title">Tìm Kiếm Nâng Cao</h5>
+                    <p class="card-text">Tìm kiếm khuyến mãi với nhiều tiêu chí lọc khác nhau.</p>
+                    <a asp-action="TimKiemNangCao" class="btn btn-info">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Báo cáo -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-file-excel fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">Xuất Báo Cáo</h5>
+                    <p class="card-text">Xuất báo cáo Excel về hiệu quả sử dụng khuyến mãi.</p>
+                    <form method="post" asp-action="XuatBaoCao" style="display: inline;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-file-excel"></i> Xuất Excel
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Công cụ hỗ trợ -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-tools fa-3x text-secondary"></i>
+                    </div>
+                    <h5 class="card-title">Công Cụ Hỗ Trợ</h5>
+                    <p class="card-text">Các công cụ hỗ trợ như sao chép khuyến mãi, tạo hàng loạt.</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-secondary" onclick="showCopyModal()">
+                            <i class="fas fa-copy"></i> Sao chép
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="showBulkCreateModal()">
+                            <i class="fas fa-layer-group"></i> Tạo hàng loạt
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Khuyến mãi sắp hết hạn -->
+    @if (ViewBag.KhuyenMaiSapHetHan != null && ((IEnumerable<dynamic>)ViewBag.KhuyenMaiSapHetHan).Any())
+    {
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Khuyến mãi sắp hết hạn (7 ngày tới)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Mã khuyến mãi</th>
+                                        <th>Tên chương trình</th>
+                                        <th>Ngày hết hạn</th>
+                                        <th>Còn lại</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in (IEnumerable<dynamic>)ViewBag.KhuyenMaiSapHetHan)
+                                    {
+                                        var soNgayConLai = ((DateTime)item.NgayKetThuc - DateTime.Now).Days;
+                                        <tr>
+                                            <td><span class="badge bg-warning text-dark">@item.MaKhuyenMai</span></td>
+                                            <td>@item.TenKhuyenMai</td>
+                                            <td>@((DateTime)item.NgayKetThuc).ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                <span class="badge bg-danger">@soNgayConLai ngày</span>
+                                            </td>
+                                            <td>
+                                                <a asp-action="Edit" asp-route-id="@item.KhuyenMaiId" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i> Gia hạn
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal sao chép khuyến mãi -->
+<div class="modal fade" id="copyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sao chép khuyến mãi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Chọn khuyến mãi muốn sao chép:</p>
+                <select class="form-select" id="selectKhuyenMai">
+                    <option value="">-- Chọn khuyến mãi --</option>
+                    <!-- Sẽ được load bằng AJAX -->
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="copyPromotion()">Sao chép</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showCopyModal() {
+            // Load danh sách khuyến mãi
+            $.get('@Url.Action("Index")', function(data) {
+                // Parse HTML và lấy danh sách khuyến mãi
+                // Đây là implementation đơn giản, có thể tạo API riêng
+                $('#copyModal').modal('show');
+            });
+        }
+
+        function showBulkCreateModal() {
+            alert('Tính năng tạo hàng loạt sẽ được phát triển trong phiên bản tiếp theo.');
+        }
+
+        function copyPromotion() {
+            var selectedId = $('#selectKhuyenMai').val();
+            if (selectedId) {
+                window.location.href = '@Url.Action("Copy")' + '/' + selectedId;
+            } else {
+                alert('Vui lòng chọn khuyến mãi muốn sao chép.');
+            }
+        }
+    </script>
+}

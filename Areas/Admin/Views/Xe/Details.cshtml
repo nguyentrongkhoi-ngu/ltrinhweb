@@ -1,0 +1,19 @@
+@model DatVeXe.Models.Xe
+@{
+    ViewData["Title"] = "Chi tiết xe";
+}
+<h2>Chi tiết xe</h2>
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Biển số xe</dt>
+        <dd class="col-sm-10">@Model.BienSoXe</dd>
+        <dt class="col-sm-2">Loại xe</dt>
+        <dd class="col-sm-10">@Model.LoaiXe</dd>
+        <dt class="col-sm-2">Số ghế</dt>
+        <dd class="col-sm-10">@Model.SoGhe</dd>
+        <dt class="col-sm-2">Mô tả</dt>
+        <dd class="col-sm-10">@Model.MoTa</dd>
+    </dl>
+    <a asp-action="Edit" asp-route-id="@Model.XeId" class="btn btn-primary">Sửa</a>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</div>

@@ -1,0 +1,419 @@
+@model DatVeXe.Models.NguoiDung
+
+@{
+    ViewData["Title"] = "Chi tiết người dùng";
+}
+
+<style>
+.card, .card-body, .form-control-plaintext, .card-header, .card-footer, .text-muted, .badge, .table, .table th, .table td {
+    color: #2c3e50 !important;
+}
+.text-muted {
+    color: #6c757d !important;
+}
+.bg-warning, .badge.bg-warning {
+    color: #212529 !important;
+}
+.bg-light, .badge.bg-light {
+    color: #212529 !important;
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 style="color: #2c3e50; font-weight: 600;">
+            <i class="fas fa-user text-primary me-2"></i>
+            Chi tiết người dùng
+        </h3>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Edit", new { id = Model.NguoiDungId })" class="btn btn-warning">
+                <i class="fas fa-edit me-1"></i> Chỉnh sửa
+            </a>
+            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Info Card -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        Thông tin cá nhân
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="user-avatar mb-3">
+                        <i class="fas fa-user-circle" style="font-size: 5rem; color: #6CABDD;"></i>
+                    </div>
+                    <h4 class="mb-2">@Model.HoTen</h4>
+                    <p class="text-muted mb-3">@Model.Email</p>
+                    
+                    <div class="mb-3">
+                        @if (Model.LaAdmin)
+                        {
+                            <span class="badge bg-warning text-dark border border-dark fw-bold">
+                                <i class="fas fa-crown me-1"></i>Quản trị viên
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary text-white fs-6">
+                                <i class="fas fa-user me-1"></i>Người dùng
+                            </span>
+                        }
+                    </div>
+
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h5 class="mb-0 text-primary">@ViewBag.TotalTickets</h5>
+                                <small class="text-muted">Vé đã đặt</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="mb-0 text-success">@ViewBag.TotalSpent.ToString("N0") VNĐ</h5>
+                            <small class="text-muted">Tổng chi tiêu</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Card -->
+            <div class="card mt-3">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Trạng thái tài khoản
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Trạng thái hoạt động</label>
+                        <div>
+                            <span class="badge bg-@(Model.TrangThaiHoatDong ? "success text-white" : "danger text-white") fs-6">
+                                <i class="fas fa-@(Model.TrangThaiHoatDong ? "check" : "times") me-1"></i>
+                                @(Model.TrangThaiHoatDong ? "Hoạt động" : "Không hoạt động")
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tài khoản</label>
+                        <div>
+                            <span class="badge bg-@(Model.TaiKhoanBiKhoa ? "danger text-white" : "success text-white") fs-6">
+                                <i class="fas fa-@(Model.TaiKhoanBiKhoa ? "lock" : "unlock") me-1"></i>
+                                @(Model.TaiKhoanBiKhoa ? "Bị khoá" : "Bình thường")
+                            </span>
+                        </div>
+                    </div>
+
+                    @if (Model.TaiKhoanBiKhoa && !string.IsNullOrEmpty(Model.LyDoKhoa))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Lý do khoá</label>
+                            <div class="alert alert-danger mb-0">
+                                <small>@Model.LyDoKhoa</small>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label">Ngày đăng ký</label>
+                        <div>
+                            <i class="fas fa-calendar text-muted me-1"></i>
+                            @Model.NgayDangKy.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                    </div>
+
+                    @if (Model.LanDangNhapCuoi.HasValue)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Lần đăng nhập cuối</label>
+                            <div>
+                                <i class="fas fa-clock text-muted me-1"></i>
+                                @Model.LanDangNhapCuoi.Value.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.NgayCapNhat.HasValue)
+                    {
+                        <div class="mb-0">
+                            <label class="form-label">Lần cập nhật cuối</label>
+                            <div>
+                                <i class="fas fa-edit text-muted me-1"></i>
+                                @Model.NgayCapNhat.Value.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Info -->
+        <div class="col-md-8">
+            <!-- Personal Information -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-address-card me-2"></i>
+                        Thông tin chi tiết
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">ID người dùng</label>
+                                <div class="form-control-plaintext">@Model.NguoiDungId</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Họ tên</label>
+                                <div class="form-control-plaintext">@Model.HoTen</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <div class="form-control-plaintext">
+                                    <i class="fas fa-envelope text-muted me-1"></i>
+                                    @Model.Email
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Số điện thoại</label>
+                                <div class="form-control-plaintext">
+                                    @if (!string.IsNullOrEmpty(Model.SoDienThoai))
+                                    {
+                                        <i class="fas fa-phone text-muted me-1"></i>
+                                        @Model.SoDienThoai
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Giới tính</label>
+                                <div class="form-control-plaintext">
+                                    @if (!string.IsNullOrEmpty(Model.GioiTinh))
+                                    {
+                                        @Model.GioiTinh
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày sinh</label>
+                                <div class="form-control-plaintext">
+                                    @if (Model.NgaySinh.HasValue)
+                                    {
+                                        <i class="fas fa-birthday-cake text-muted me-1"></i>
+                                        @Model.NgaySinh.Value.ToString("dd/MM/yyyy")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Địa chỉ</label>
+                                <div class="form-control-plaintext">
+                                    @if (!string.IsNullOrEmpty(Model.DiaChi))
+                                    {
+                                        <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                        @Model.DiaChi
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Quyền hạn</label>
+                                <div class="form-control-plaintext">
+                                    @if (Model.LaAdmin)
+                                    {
+                                        <span class="badge bg-warning text-dark border border-dark fw-bold">
+                                            <i class="fas fa-crown me-1"></i>Quản trị viên
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-user me-1"></i>Người dùng
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="card mt-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Thống kê hoạt động
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-1">@ViewBag.TotalTickets</h4>
+                                <small class="text-muted">Tổng vé đã đặt</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h4 class="text-success mb-1">@ViewBag.CompletedTrips</h4>
+                                <small class="text-muted">Chuyến đi hoàn thành</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h4 class="text-danger mb-1">@ViewBag.CancelledTickets</h4>
+                                <small class="text-muted">Vé đã hủy</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-info mb-1">@ViewBag.TotalSpent.ToString("N0")</h4>
+                            <small class="text-muted">Tổng chi tiêu (VNĐ)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mt-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools me-2"></i>
+                        Thao tác nhanh
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="@Url.Action("Edit", new { id = Model.NguoiDungId })" class="btn btn-warning">
+                            <i class="fas fa-edit me-1"></i> Chỉnh sửa thông tin
+                        </a>
+                        
+                        <button type="button" class="btn btn-@(Model.TrangThaiHoatDong ? "danger" : "success")" 
+                                onclick="toggleStatus(@Model.NguoiDungId)">
+                            <i class="fas fa-@(Model.TrangThaiHoatDong ? "ban" : "check") me-1"></i> 
+                            @(Model.TrangThaiHoatDong ? "Vô hiệu hóa" : "Kích hoạt")
+                        </button>
+
+                        <button type="button" class="btn btn-@(Model.TaiKhoanBiKhoa ? "success" : "danger")" 
+                                onclick="toggleLock(@Model.NguoiDungId)">
+                            <i class="fas fa-@(Model.TaiKhoanBiKhoa ? "unlock" : "lock") me-1"></i> 
+                            @(Model.TaiKhoanBiKhoa ? "Mở khoá" : "Khoá tài khoản")
+                        </button>
+
+                        <button type="button" class="btn btn-info" onclick="resetPassword(@Model.NguoiDungId)">
+                            <i class="fas fa-key me-1"></i> Đặt lại mật khẩu
+                        </button>
+
+                        <a href="@Url.Action("UserStatistics", new { id = Model.NguoiDungId })" class="btn btn-secondary">
+                            <i class="fas fa-chart-line me-1"></i> Xem thống kê chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Tickets -->
+            @if (Model.Ves != null && Model.Ves.Any())
+            {
+                <div class="card mt-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-ticket-alt me-2"></i>
+                            Vé gần đây
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã vé</th>
+                                        <th>Tuyến đường</th>
+                                        <th>Ngày khởi hành</th>
+                                        <th>Giá vé</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ve in Model.Ves.OrderByDescending(v => v.NgayDat).Take(5))
+                                    {
+                                        <tr>
+                                            <td>@ve.VeId</td>
+                                            <td>
+                                                @if (ve.ChuyenXe?.TuyenDuong != null)
+                                                {
+                                                    @ve.ChuyenXe.TuyenDuong.DiemDi <i class="fas fa-arrow-right mx-1"></i> @ve.ChuyenXe.TuyenDuong.DiemDen
+                                                }
+                                            </td>
+                                            <td>@ve.ChuyenXe?.NgayKhoiHanh.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>@ve.GiaVe.ToString("N0") VNĐ</td>
+                                            <td>
+                                                @{
+                                                    var statusColor = GetStatusColor(ve.VeTrangThai);
+                                                    var textColor = statusColor == "warning" || statusColor == "light" ? "text-dark" : "text-white";
+                                                }
+                                                <span class="badge bg-@statusColor @textColor">
+                                                    @ve.VeTrangThai.GetDisplayName()
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusColor(DatVeXe.Models.TrangThaiVe trangThai)
+    {
+        return trangThai switch
+        {
+            DatVeXe.Models.TrangThaiVe.DaDat => "warning",
+            DatVeXe.Models.TrangThaiVe.DaThanhToan => "info",
+            DatVeXe.Models.TrangThaiVe.DaHoanThanh => "success",
+            DatVeXe.Models.TrangThaiVe.DaHuy => "danger",
+            DatVeXe.Models.TrangThaiVe.DaSuDung => "primary",
+            DatVeXe.Models.TrangThaiVe.DaHoanTien => "secondary",
+            _ => "secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script src="~/js/user-management.js"></script>
+}

@@ -1,0 +1,247 @@
+@model IEnumerable<DatVeXe.Models.LichSuKhuyenMai>
+
+@{
+    ViewData["Title"] = "Lịch sử sử dụng khuyến mãi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 style="color: #2c3e50; font-weight: 600;">
+        <i class="fas fa-history" style="color: #e74c3c;"></i>
+        Lịch sử sử dụng khuyến mãi
+    </h3>
+    <div>
+        <a asp-action="Dashboard" class="btn btn-info">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-list"></i> Danh sách khuyến mãi
+        </a>
+    </div>
+</div>
+
+<!-- Bộ lọc -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-filter"></i>
+            Bộ lọc tìm kiếm
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="LichSuSuDung">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Khuyến mãi</label>
+                    <select name="khuyenMaiId" class="form-select">
+                        <option value="">-- Tất cả --</option>
+                        @foreach (var km in (IEnumerable<DatVeXe.Models.KhuyenMai>)ViewBag.KhuyenMais)
+                        {
+                            var isSelected = ViewBag.CurrentKhuyenMaiId?.ToString() == km.KhuyenMaiId.ToString();
+                            if (isSelected)
+                            {
+                                <option value="@km.KhuyenMaiId" selected>
+                                    @km.MaKhuyenMai - @km.TenKhuyenMai
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@km.KhuyenMaiId">
+                                    @km.MaKhuyenMai - @km.TenKhuyenMai
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" name="tuNgay" class="form-control" value="@(ViewBag.CurrentTuNgay != null ? ((DateTime)ViewBag.CurrentTuNgay).ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" name="denNgay" class="form-control" value="@(ViewBag.CurrentDenNgay != null ? ((DateTime)ViewBag.CurrentDenNgay).ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Thống kê nhanh -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h4>@ViewBag.TotalItems</h4>
+                <p class="mb-0">Tổng lượt sử dụng</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h4>@Model.Sum(m => m.GiaTriGiam).ToString("N0") VNĐ</h4>
+                <p class="mb-0">Tổng tiền giảm</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h4>@(Model.Any() ? Model.Average(m => m.GiaTriGiam).ToString("N0") : "0") VNĐ</h4>
+                <p class="mb-0">Trung bình mỗi lần</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nút xuất báo cáo -->
+<div class="mb-3">
+    <form method="post" asp-action="XuatBaoCao" style="display: inline;">
+        <input type="hidden" name="khuyenMaiId" value="@ViewBag.CurrentKhuyenMaiId" />
+        <input type="hidden" name="tuNgay" value="@ViewBag.CurrentTuNgay" />
+        <input type="hidden" name="denNgay" value="@ViewBag.CurrentDenNgay" />
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Xuất Excel
+        </button>
+    </form>
+</div>
+
+<!-- Bảng dữ liệu -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-table"></i>
+            Danh sách lịch sử sử dụng
+        </h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead style="background-color: #34495e; color: white;">
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã khuyến mãi</th>
+                            <th>Tên chương trình</th>
+                            <th>Khách hàng</th>
+                            <th>Tuyến đường</th>
+                            <th>Thời gian sử dụng</th>
+                            <th>Giá trị giảm</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var stt = (ViewBag.CurrentPage - 1) * 20 + 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>
+                                    <span class="badge bg-primary">@item.MaKhuyenMai</span>
+                                </td>
+                                <td>@item.KhuyenMai?.TenKhuyenMai</td>
+                                <td>
+                                    <div>
+                                        <strong>@item.NguoiDung?.HoTen</strong>
+                                        @if (!string.IsNullOrEmpty(item.NguoiDung?.SoDienThoai))
+                                        {
+                                            <br><small class="text-muted">@item.NguoiDung.SoDienThoai</small>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (item.Ve?.ChuyenXe?.TuyenDuong != null)
+                                    {
+                                        <span>@item.Ve.ChuyenXe.TuyenDuong.DiemDi → @item.Ve.ChuyenXe.TuyenDuong.DiemDen</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>@item.ThoiGianSuDung.ToString("dd/MM/yyyy")</strong>
+                                        <br><small class="text-muted">@item.ThoiGianSuDung.ToString("HH:mm:ss")</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">@item.GiaTriGiam.ToString("N0") VNĐ</span>
+                                </td>
+                                <td>
+                                    @if (item.Ve != null)
+                                    {
+                                        <a asp-controller="Ve" asp-action="Details" asp-route-id="@item.Ve.VeId" 
+                                           class="btn btn-sm btn-outline-info" title="Xem chi tiết vé">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang -->
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav aria-label="Phân trang">
+                    <ul class="pagination justify-content-center">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="LichSuSuDung" 
+                                   asp-route-khuyenMaiId="@ViewBag.CurrentKhuyenMaiId"
+                                   asp-route-tuNgay="@ViewBag.CurrentTuNgay"
+                                   asp-route-denNgay="@ViewBag.CurrentDenNgay"
+                                   asp-route-page="@(ViewBag.CurrentPage - 1)">Trước</a>
+                            </li>
+                        }
+
+                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="LichSuSuDung" 
+                                   asp-route-khuyenMaiId="@ViewBag.CurrentKhuyenMaiId"
+                                   asp-route-tuNgay="@ViewBag.CurrentTuNgay"
+                                   asp-route-denNgay="@ViewBag.CurrentDenNgay"
+                                   asp-route-page="@i">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="LichSuSuDung" 
+                                   asp-route-khuyenMaiId="@ViewBag.CurrentKhuyenMaiId"
+                                   asp-route-tuNgay="@ViewBag.CurrentTuNgay"
+                                   asp-route-denNgay="@ViewBag.CurrentDenNgay"
+                                   asp-route-page="@(ViewBag.CurrentPage + 1)">Sau</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-history fa-3x mb-3"></i>
+                <h5>Không có dữ liệu</h5>
+                <p>Không tìm thấy lịch sử sử dụng khuyến mãi nào với điều kiện tìm kiếm hiện tại.</p>
+            </div>
+        }
+    </div>
+</div>

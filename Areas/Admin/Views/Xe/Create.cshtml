@@ -1,0 +1,144 @@
+@model DatVeXe.Models.Xe
+@{
+    ViewData["Title"] = "Thêm xe mới";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="text-white mb-1">
+                    <i class="fas fa-bus text-primary me-2"></i>
+                    Thêm xe mới
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="text-decoration-none">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-action="Index" class="text-decoration-none">Quản lý xe</a>
+                        </li>
+                        <li class="breadcrumb-item active">Thêm mới</li>
+                    </ol>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Quay lại danh sách
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Thông tin xe mới
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="BienSoXe" class="form-label fw-bold" style="color: black;">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    Biển số xe *
+                                </label>
+                                <input asp-for="BienSoXe" class="form-control" placeholder="Ví dụ: 29A-12345" />
+                                <span asp-validation-for="BienSoXe" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="LoaiXe" class="form-label fw-bold" style="color: black;">
+                                    <i class="fas fa-bus me-1"></i>
+                                    Loại xe *
+                                </label>
+                                <select asp-for="LoaiXe" class="form-select">
+                                    <option value="">-- Chọn loại xe --</option>
+                                    <option value="Xe khách 16 chỗ">Xe khách 16 chỗ</option>
+                                    <option value="Xe khách 29 chỗ">Xe khách 29 chỗ</option>
+                                    <option value="Xe khách 45 chỗ">Xe khách 45 chỗ</option>
+                                    <option value="Xe giường nằm">Xe giường nằm</option>
+                                    <option value="Xe limousine">Xe limousine</option>
+                                </select>
+                                <span asp-validation-for="LoaiXe" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="SoGhe" class="form-label fw-bold" style="color: black;">
+                                    <i class="fas fa-chair me-1"></i>
+                                    Số ghế *
+                                </label>
+                                <input asp-for="SoGhe" type="number" min="1" max="50" class="form-control" placeholder="Nhập số ghế" />
+                                <span asp-validation-for="SoGhe" class="text-danger"></span>
+                                <div class="form-text">Số ghế từ 1 đến 50</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="NhaXe" class="form-label fw-bold" style="color: black;">
+                                    <i class="fas fa-building me-1"></i>
+                                    Nhà xe
+                                </label>
+                                <input asp-for="NhaXe" class="form-control" placeholder="Tên nhà xe" />
+                                <span asp-validation-for="NhaXe" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="MoTa" class="form-label fw-bold" style="color: black;">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Mô tả
+                        </label>
+                        <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Mô tả thêm về xe (tùy chọn)"></textarea>
+                        <span asp-validation-for="MoTa" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input asp-for="TrangThaiHoatDong" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="TrangThaiHoatDong" class="form-check-label fw-bold" style="color: black;">
+                                <i class="fas fa-toggle-on me-1"></i>
+                                Kích hoạt xe
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <a asp-action="Index" class="btn btn-secondary me-2">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu xe
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    <link rel="icon" type="image/jpeg" href="~/images/realvscity.jpg" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DatVeXe.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .admin-sidebar {
+            background: #2c3e50;
+            min-height: 100vh;
+            padding: 0;
+            border-right: 3px solid #34495e;
+        }
+        .admin-sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 20px;
+            border-bottom: 1px solid #34495e;
+            transition: all 0.3s ease;
+        }
+        .admin-sidebar .nav-link:hover,
+        .admin-sidebar .nav-link.active {
+            color: #ffffff;
+            background-color: #34495e;
+            border-left: 4px solid #3498db;
+            transform: translateX(5px);
+        }
+        .admin-sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            color: #3498db;
+        }
+        .admin-header {
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #ecf0f1;
+        }
+        .admin-content {
+            padding: 0 30px;
+        }
+        .stats-card {
+            background: #ffffff;
+            color: #2c3e50;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .stats-card .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .stats-card .stats-label {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        .stats-card i {
+            font-size: 3rem;
+            color: #3498db;
+            opacity: 0.2;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="admin-body">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 admin-sidebar">
+                <div class="position-sticky pt-3">
+                    <div class="text-center py-4" style="background: #34495e; margin-bottom: 10px;">
+                        <h4 class="text-white mb-0">
+                            <i class="fas fa-bus" style="color: #3498db;"></i>
+                            Admin Panel
+                        </h4>
+                        <small class="text-muted" style="color: #bdc3c7 !important;">Hệ thống quản trị</small>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Admin" asp-action="Index">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Admin" asp-action="QuanLyNguoiDung">
+                                <i class="fas fa-users"></i>
+                                Quản lý người dùng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Admin" asp-action="QuanLyTuyenDuong">
+                                <i class="fas fa-route"></i>
+                                Quản lý tuyến đường
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="QuanLyXe" asp-action="Index">
+                                <i class="fas fa-bus"></i>
+                                Quản lý xe
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Admin" asp-action="QuanLyChuyenXe">
+                                <i class="fas fa-calendar-alt"></i>
+                                Quản lý chuyến xe
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Booking" asp-action="AdminBookingList">
+                                <i class="fas fa-clipboard-check"></i>
+                                Quản lý đặt vé
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="KhuyenMai" asp-action="Index">
+                                <i class="fas fa-tags"></i>
+                                Quản lý khuyến mãi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Review" asp-action="Index">
+                                <i class="fas fa-star"></i>
+                                Quản lý đánh giá
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index" asp-area="">
+                                <i class="fas fa-arrow-left"></i>
+                                Về trang chủ
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="admin-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 style="color: #2c3e50; font-weight: 600;">@ViewData["Title"]</h2>
+                        <div class="text-muted d-flex align-items-center">
+                            <i class="fas fa-user-shield me-2" style="color: #3498db;"></i>
+                            <span style="color: #7f8c8d; font-weight: 500;">Quản trị viên</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-content">
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

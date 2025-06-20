@@ -1,0 +1,533 @@
+@model IEnumerable<DatVeXe.Models.NguoiDung>
+
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 style="color: #2c3e50; font-weight: 600;">
+            <i class="fas fa-users text-primary me-2"></i>
+            Quản lý người dùng
+        </h3>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("ExportUsers")" class="btn btn-success">
+                <i class="fas fa-download me-1"></i> Xuất Excel
+            </a>
+            <a href="@Url.Action("Create")" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Thêm người dùng
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Index">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label" style="color: black;">Tìm kiếm</label>
+                        <input type="text" name="searchString" value="@ViewBag.CurrentFilter" 
+                               class="form-control" placeholder="Tên, email, số điện thoại..." />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" style="color: black;">Trạng thái</label>
+                        <select name="isActive" class="form-select">
+                            <option value="">Tất cả</option>
+                            <option value="true" selected="@(ViewBag.IsActiveFilter == "true")">Hoạt động</option>
+                            <option value="false" selected="@(ViewBag.IsActiveFilter == "false")">Không hoạt động</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" style="color: black;">Quyền</label>
+                        <select name="isAdmin" class="form-select">
+                            <option value="">Tất cả</option>
+                            <option value="true" selected="@(ViewBag.IsAdminFilter == "true")">Admin</option>
+                            <option value="false" selected="@(ViewBag.IsAdminFilter == "false")">Người dùng</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" style="color: black;">Sắp xếp</label>
+                        <select name="sortOrder" class="form-select">
+                            <option value="" selected="@(ViewBag.CurrentSort == "")">Tên A-Z</option>
+                            <option value="name_desc" selected="@(ViewBag.CurrentSort == "name_desc")">Tên Z-A</option>
+                            <option value="date" selected="@(ViewBag.CurrentSort == "date")">Ngày đăng ký cũ nhất</option>
+                            <option value="date_desc" selected="@(ViewBag.CurrentSort == "date_desc")">Ngày đăng ký mới nhất</option>
+                            <option value="email" selected="@(ViewBag.CurrentSort == "email")">Email A-Z</option>
+                            <option value="email_desc" selected="@(ViewBag.CurrentSort == "email_desc")">Email Z-A</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="fas fa-refresh"></i> Đặt lại
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="fas fa-list me-2"></i>
+                Danh sách người dùng (@ViewBag.TotalCount)
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead style="background-color: #34495e; color: white;">
+                        <tr>
+                            <th>
+                                <a href="@Url.Action("Index", new { sortOrder = ViewBag.NameSortParm, searchString = ViewBag.CurrentFilter })" 
+                                   class="text-white text-decoration-none">
+                                    Họ tên
+                                    @if (ViewBag.CurrentSort == "")
+                                    {
+                                        <i class="fas fa-sort-up"></i>
+                                    }
+                                    else if (ViewBag.CurrentSort == "name_desc")
+                                    {
+                                        <i class="fas fa-sort-down"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort"></i>
+                                    }
+                                </a>
+                            </th>
+                            <th>
+                                <a href="@Url.Action("Index", new { sortOrder = ViewBag.EmailSortParm, searchString = ViewBag.CurrentFilter })" 
+                                   class="text-white text-decoration-none">
+                                    Email
+                                    @if (ViewBag.CurrentSort == "email")
+                                    {
+                                        <i class="fas fa-sort-up"></i>
+                                    }
+                                    else if (ViewBag.CurrentSort == "email_desc")
+                                    {
+                                        <i class="fas fa-sort-down"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort"></i>
+                                    }
+                                </a>
+                            </th>
+                            <th>Số điện thoại</th>
+                            <th>
+                                <a href="@Url.Action("Index", new { sortOrder = ViewBag.DateSortParm, searchString = ViewBag.CurrentFilter })" 
+                                   class="text-white text-decoration-none">
+                                    Ngày đăng ký
+                                    @if (ViewBag.CurrentSort == "date")
+                                    {
+                                        <i class="fas fa-sort-up"></i>
+                                    }
+                                    else if (ViewBag.CurrentSort == "date_desc")
+                                    {
+                                        <i class="fas fa-sort-down"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort"></i>
+                                    }
+                                </a>
+                            </th>
+                            <th>Quyền</th>
+                            <th>Trạng thái</th>
+                            <th>Tài khoản</th>
+                            <th width="200">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr id="user-row-@user.NguoiDungId">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="fas fa-user-circle fs-4 text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <strong>@user.HoTen</strong>
+                                            @if (user.LaAdmin)
+                                            {
+                                                <span class="badge bg-warning text-dark ms-1">
+                                                    <i class="fas fa-crown me-1"></i>Admin
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <i class="fas fa-envelope text-muted me-1"></i>
+                                    @user.Email
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(user.SoDienThoai))
+                                    {
+                                        <i class="fas fa-phone text-muted me-1"></i>
+                                        @user.SoDienThoai
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar text-muted me-1"></i>
+                                        @user.NgayDangKy.ToString("dd/MM/yyyy")
+                                    </small>
+                                </td>
+                                <td>
+                                    @if (user.LaAdmin)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-user-shield me-1"></i>Admin
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-user me-1"></i>Người dùng
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-@(user.TrangThaiHoatDong ? "success" : "danger")" id="status-badge-@user.NguoiDungId">
+                                        <i class="fas fa-@(user.TrangThaiHoatDong ? "check" : "times") me-1"></i>
+                                        @(user.TrangThaiHoatDong ? "Hoạt động" : "Không hoạt động")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@(user.TaiKhoanBiKhoa ? "danger" : "success")" id="lock-badge-@user.NguoiDungId">
+                                        <i class="fas fa-@(user.TaiKhoanBiKhoa ? "lock" : "unlock") me-1"></i>
+                                        @(user.TaiKhoanBiKhoa ? "Bị khoá" : "Bình thường")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("Details", new { id = user.NguoiDungId })" 
+                                           class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = user.NguoiDungId })" 
+                                           class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-@(user.TrangThaiHoatDong ? "danger" : "success")" 
+                                                onclick="toggleStatus(@user.NguoiDungId)" 
+                                                title="@(user.TrangThaiHoatDong ? "Vô hiệu hóa" : "Kích hoạt")">
+                                            <i class="fas fa-@(user.TrangThaiHoatDong ? "ban" : "check")"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-@(user.TaiKhoanBiKhoa ? "success" : "danger")" 
+                                                onclick="toggleLock(@user.NguoiDungId)" 
+                                                title="@(user.TaiKhoanBiKhoa ? "Mở khoá" : "Khoá tài khoản")">
+                                            <i class="fas fa-@(user.TaiKhoanBiKhoa ? "unlock" : "lock")"></i>
+                                        </button>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                    data-bs-toggle="dropdown" title="Thêm">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="@Url.Action("UserStatistics", new { id = user.NguoiDungId })">
+                                                        <i class="fas fa-chart-bar me-2"></i>Thống kê
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <button class="dropdown-item" onclick="resetPassword(@user.NguoiDungId)">
+                                                        <i class="fas fa-key me-2"></i>Đặt lại mật khẩu
+                                                    </button>
+                                                </li>
+                                                @if (!string.IsNullOrEmpty(user.LyDoKhoa))
+                                                {
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <span class="dropdown-item-text text-danger small">
+                                                            <strong>Lý do khoá:</strong><br>
+                                                            @user.LyDoKhoa
+                                                        </span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav aria-label="Phân trang người dùng" class="mt-4">
+            <ul class="pagination justify-content-center">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, searchString = ViewBag.CurrentFilter, sortOrder = ViewBag.CurrentSort })">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                }
+
+                @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = ViewBag.CurrentFilter, sortOrder = ViewBag.CurrentSort })">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, searchString = ViewBag.CurrentFilter, sortOrder = ViewBag.CurrentSort })">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+<!-- Lock Modal -->
+<div class="modal fade" id="lockModal" tabindex="-1" aria-labelledby="lockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white text-dark">
+            <div class="modal-header text-dark">
+                <h5 class="modal-title" id="lockModalLabel">Khoá tài khoản</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-dark">
+                <form id="lockForm">
+                    <div class="mb-3">
+                        <label for="lockReason" class="form-label">Lý do khoá tài khoản</label>
+                        <textarea class="form-control" id="lockReason" rows="3" placeholder="Nhập lý do khoá tài khoản..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer text-dark">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmLock">Khoá tài khoản</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resetPasswordModalLabel">Đặt lại mật khẩu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resetPasswordForm">
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                        <input type="password" class="form-control" id="newPassword" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)">
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Nhập lại mật khẩu mới">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="confirmResetPassword">Đặt lại mật khẩu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentUserId = null;
+
+        function toggleStatus(userId) {
+            if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái tài khoản này?')) {
+                $.post('@Url.Action("ToggleStatus")', { userId: userId })
+                    .done(function(data) {
+                        if (data.success) {
+                            // Update badge
+                            const badge = $('#status-badge-' + userId);
+                            if (data.isActive) {
+                                badge.removeClass('bg-danger').addClass('bg-success');
+                                badge.html('<i class="fas fa-check me-1"></i>Hoạt động');
+                            } else {
+                                badge.removeClass('bg-success').addClass('bg-danger');
+                                badge.html('<i class="fas fa-times me-1"></i>Không hoạt động');
+                            }
+                            
+                            showToast(data.message, 'success');
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    })
+                    .fail(function() {
+                        showToast('Có lỗi xảy ra khi thay đổi trạng thái', 'error');
+                    });
+            }
+        }
+
+        function toggleLock(userId) {
+            currentUserId = userId;
+            const badge = $('#lock-badge-' + userId);
+            const isLocked = badge.hasClass('bg-danger');
+            
+            if (isLocked) {
+                // Unlock account
+                if (confirm('Bạn có chắc chắn muốn mở khoá tài khoản này?')) {
+                    $.post('@Url.Action("ToggleLock")', { userId: userId })
+                        .done(function(data) {
+                            if (data.success) {
+                                badge.removeClass('bg-danger').addClass('bg-success');
+                                badge.html('<i class="fas fa-unlock me-1"></i>Bình thường');
+                                showToast(data.message, 'success');
+                            } else {
+                                showToast(data.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            showToast('Có lỗi xảy ra khi mở khoá tài khoản', 'error');
+                        });
+                }
+            } else {
+                // Lock account with reason
+                $('#lockModal').modal('show');
+            }
+        }
+
+        function resetPassword(userId) {
+            currentUserId = userId;
+            $('#resetPasswordModal').modal('show');
+        }
+
+        $('#confirmLock').click(function() {
+            const reason = $('#lockReason').val();
+            
+            $.post('@Url.Action("ToggleLock")', { 
+                userId: currentUserId, 
+                reason: reason 
+            })
+            .done(function(data) {
+                if (data.success) {
+                    const badge = $('#lock-badge-' + currentUserId);
+                    badge.removeClass('bg-success').addClass('bg-danger');
+                    badge.html('<i class="fas fa-lock me-1"></i>Bị khoá');
+                    
+                    $('#lockModal').modal('hide');
+                    $('#lockReason').val('');
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .fail(function() {
+                showToast('Có lỗi xảy ra khi khoá tài khoản', 'error');
+            });
+        });
+
+        $('#confirmResetPassword').click(function() {
+            const newPassword = $('#newPassword').val();
+            const confirmPassword = $('#confirmPassword').val();
+            
+            if (newPassword.length < 6) {
+                showToast('Mật khẩu phải có ít nhất 6 ký tự', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showToast('Mật khẩu xác nhận không khớp', 'error');
+                return;
+            }
+            
+            $.post('@Url.Action("ResetPassword")', { 
+                userId: currentUserId, 
+                newPassword: newPassword 
+            })
+            .done(function(data) {
+                if (data.success) {
+                    $('#resetPasswordModal').modal('hide');
+                    $('#newPassword').val('');
+                    $('#confirmPassword').val('');
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .fail(function() {
+                showToast('Có lỗi xảy ra khi đặt lại mật khẩu', 'error');
+            });
+        });
+
+        function showToast(message, type) {
+            const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const toast = $(`
+                <div class="toast align-items-center text-white ${toastClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `);
+            
+            if (!$('#toast-container').length) {
+                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            }
+            
+            $('#toast-container').append(toast);
+            toast.toast('show');
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+    </script>
+}
+
+<style>
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .table th a {
+        text-decoration: none !important;
+    }
+    
+    .table th a:hover {
+        text-decoration: underline !important;
+    }
+    
+    .btn-group .dropdown-toggle::after {
+        margin-left: 0;
+    }
+    
+    .toast-container {
+        z-index: 1060;
+    }
+</style>

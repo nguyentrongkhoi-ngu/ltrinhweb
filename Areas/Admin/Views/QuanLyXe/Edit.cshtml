@@ -1,0 +1,318 @@
+@model DatVeXe.Models.Xe
+@{
+    ViewData["Title"] = "Chỉnh sửa xe";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">
+                        <i class="fas fa-edit text-primary"></i>
+                        Chỉnh sửa xe
+                    </h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Trang chủ
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="QuanLyXe" asp-action="Index">
+                                <i class="fas fa-bus"></i> Quản lý xe
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">Chỉnh sửa xe</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title text-dark">
+                                <i class="fas fa-edit"></i>
+                                Thông tin xe
+                            </h3>
+                        </div>
+                        <form asp-action="Edit" method="post" id="editXeForm">
+                            <div class="card-body">
+                                <input type="hidden" asp-for="XeId" />
+                                <input type="hidden" asp-for="NgayTao" />
+
+                                <!-- Alert container -->
+                                <div id="alertContainer"></div>
+
+                                @if (TempData["ThongBao"] != null)
+                                {
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        <i class="fas fa-check-circle"></i>
+                                        @TempData["ThongBao"]
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                }
+
+                                <div class="row">
+                                    <!-- Cột trái -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="BienSoXe" class="form-label text-dark">
+                                                <i class="fas fa-id-card text-primary"></i>
+                                                Biển số xe <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="BienSoXe" class="form-control"
+                                                   placeholder="Nhập biển số xe (VD: 51A-12345)" />
+                                            <span asp-validation-for="BienSoXe" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label asp-for="LoaiXe" class="form-label text-dark">
+                                                <i class="fas fa-bus text-info"></i>
+                                                Loại xe <span class="text-danger">*</span>
+                                            </label>
+                                            <select asp-for="LoaiXe" class="form-control">
+                                                <option value="">-- Chọn loại xe --</option>
+                                                <option value="Xe khách 16 chỗ">Xe khách 16 chỗ</option>
+                                                <option value="Xe khách 29 chỗ">Xe khách 29 chỗ</option>
+                                                <option value="Xe khách 45 chỗ">Xe khách 45 chỗ</option>
+                                                <option value="Xe giường nằm 34 chỗ">Xe giường nằm 34 chỗ</option>
+                                                <option value="Xe giường nằm 40 chỗ">Xe giường nằm 40 chỗ</option>
+                                                <option value="Xe limousine 22 chỗ">Xe limousine 22 chỗ</option>
+                                                <option value="Xe limousine 28 chỗ">Xe limousine 28 chỗ</option>
+                                            </select>
+                                            <span asp-validation-for="LoaiXe" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label asp-for="SoGhe" class="form-label text-dark">
+                                                <i class="fas fa-chair text-success"></i>
+                                                Số ghế <span class="text-danger">*</span>
+                                            </label>
+                                            <input asp-for="SoGhe" class="form-control" type="number"
+                                                   min="1" max="50" placeholder="Nhập số ghế" />
+                                            <span asp-validation-for="SoGhe" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label asp-for="NhaSanXuat" class="form-label text-dark">
+                                                <i class="fas fa-industry text-info"></i>
+                                                Nhà sản xuất
+                                            </label>
+                                            <select asp-for="NhaSanXuat" class="form-control">
+                                                <option value="">-- Chọn nhà sản xuất --</option>
+                                                <option value="Hyundai">Hyundai</option>
+                                                <option value="Thaco">Thaco</option>
+                                                <option value="Isuzu">Isuzu</option>
+                                                <option value="Hino">Hino</option>
+                                                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                                <option value="Daewoo">Daewoo</option>
+                                                <option value="Samco">Samco</option>
+                                                <option value="Khác">Khác</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cột phải -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="NamSanXuat" class="form-label text-dark">
+                                                <i class="fas fa-calendar text-warning"></i>
+                                                Năm sản xuất
+                                            </label>
+                                            <input asp-for="NamSanXuat" class="form-control" type="number"
+                                                   min="1990" max="2030" placeholder="Nhập năm sản xuất" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label asp-for="MauSac" class="form-label text-dark">
+                                                <i class="fas fa-palette text-danger"></i>
+                                                Màu sắc
+                                            </label>
+                                            <input asp-for="MauSac" class="form-control"
+                                                   placeholder="Nhập màu sắc xe" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label asp-for="NhaXe" class="form-label text-dark">
+                                                <i class="fas fa-building text-primary"></i>
+                                                Nhà xe
+                                            </label>
+                                            <input asp-for="NhaXe" class="form-control"
+                                                   placeholder="Nhập tên nhà xe" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label text-dark">
+                                                <i class="fas fa-toggle-on text-primary"></i>
+                                                Trạng thái hoạt động
+                                            </label>
+                                            <div class="custom-control custom-switch">
+                                                <input asp-for="TrangThaiHoatDong" type="checkbox"
+                                                       class="custom-control-input" id="TrangThaiHoatDong" />
+                                                <label class="custom-control-label text-dark" for="TrangThaiHoatDong">
+                                                    Xe đang hoạt động
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label text-dark">
+                                                <i class="fas fa-info-circle text-info"></i>
+                                                Thông tin bổ sung
+                                            </label>
+                                            <div class="bg-light p-3 rounded">
+                                                <p class="mb-1 text-dark">
+                                                    <strong>Mã xe:</strong> XE@Model.XeId.ToString("D4")
+                                                </p>
+                                                <p class="mb-0 text-dark">
+                                                    <strong>Ngày tạo:</strong> @Model.NgayTao.ToString("dd/MM/yyyy HH:mm")
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mô tả -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label asp-for="MoTa" class="form-label text-dark">
+                                                <i class="fas fa-sticky-note text-info"></i>
+                                                Mô tả xe
+                                            </label>
+                                            <textarea asp-for="MoTa" class="form-control" rows="4"
+                                                      placeholder="Nhập mô tả chi tiết về xe..."></textarea>
+                                            <span asp-validation-for="MoTa" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="fas fa-save"></i>
+                                            Lưu thay đổi
+                                        </button>
+                                        <button type="button" class="btn btn-info btn-lg ml-2" id="resetForm">
+                                            <i class="fas fa-undo"></i>
+                                            Khôi phục
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <a asp-area="Admin" asp-controller="QuanLyXe" asp-action="Details"
+                                           asp-route-id="@Model.XeId" class="btn btn-info btn-lg">
+                                            <i class="fas fa-eye"></i>
+                                            Xem chi tiết
+                                        </a>
+                                        <a asp-area="Admin" asp-controller="QuanLyXe" asp-action="Index"
+                                           class="btn btn-secondary btn-lg ml-2">
+                                            <i class="fas fa-arrow-left"></i>
+                                            Quay lại
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function() {
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+
+            // Reset form
+            $('#resetForm').click(function() {
+                if (confirm('Bạn có chắc chắn muốn khôi phục lại dữ liệu ban đầu?')) {
+                    location.reload();
+                }
+            });
+
+            // Form validation
+            $('#editXeForm').on('submit', function(e) {
+                var isValid = true;
+                var errorMessages = [];
+
+                // Validate required fields
+                if (!$('#BienSoXe').val().trim()) {
+                    errorMessages.push('Vui lòng nhập biển số xe');
+                    isValid = false;
+                }
+
+                if (!$('#LoaiXe').val()) {
+                    errorMessages.push('Vui lòng chọn loại xe');
+                    isValid = false;
+                }
+
+                // Validate số ghế
+                var soGhe = parseInt($('#SoGhe').val());
+                if (!soGhe || soGhe <= 0 || soGhe > 50) {
+                    errorMessages.push('Số ghế phải từ 1 đến 50');
+                    isValid = false;
+                }
+
+                // Validate biển số xe format
+                var bienSo = $('#BienSoXe').val().trim();
+                var bienSoPattern = /^[0-9]{2}[A-Z]{1,2}-[0-9]{4,5}$/;
+                if (bienSo && !bienSoPattern.test(bienSo)) {
+                    errorMessages.push('Biển số xe không đúng định dạng (VD: 51A-12345)');
+                    isValid = false;
+                }
+
+                // Validate năm sản xuất
+                var namSanXuat = parseInt($('#NamSanXuat').val());
+                if (namSanXuat && (namSanXuat < 1990 || namSanXuat > 2030)) {
+                    errorMessages.push('Năm sản xuất phải từ 1990 đến 2030');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+
+                    var alertHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                        '<h5><i class="fas fa-exclamation-triangle"></i> Lỗi validation!</h5>' +
+                        '<ul class="mb-0">';
+
+                    errorMessages.forEach(function(message) {
+                        alertHtml += '<li>' + message + '</li>';
+                    });
+
+                    alertHtml += '</ul>' +
+                        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                        '<span aria-hidden="true">&times;</span>' +
+                        '</button>' +
+                        '</div>';
+
+                    $('#alertContainer').html(alertHtml);
+
+                    // Scroll to top to show error
+                    $('html, body').animate({
+                        scrollTop: $('#alertContainer').offset().top - 100
+                    }, 500);
+                }
+            });
+        });
+    </script>
+}

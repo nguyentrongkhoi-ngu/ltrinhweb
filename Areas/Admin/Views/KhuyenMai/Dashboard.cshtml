@@ -1,0 +1,242 @@
+@{
+    ViewData["Title"] = "Dashboard Khuyến Mãi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 style="color: #2c3e50; font-weight: 600;">
+        <i class="fas fa-chart-line" style="color: #e74c3c;"></i>
+        Dashboard Khuyến Mãi
+    </h3>
+    <div>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-list"></i> Danh sách khuyến mãi
+        </a>
+        <a asp-action="LichSuSuDung" class="btn btn-info">
+            <i class="fas fa-history"></i> Lịch sử sử dụng
+        </a>
+    </div>
+</div>
+
+<!-- Thống kê tổng quan -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">@ViewBag.TongKhuyenMai</h4>
+                        <p class="card-text">Tổng khuyến mãi</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-tags fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">@ViewBag.KhuyenMaiHoatDong</h4>
+                        <p class="card-text">Đang hoạt động</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">@ViewBag.KhuyenMaiSapHetHan</h4>
+                        <p class="card-text">Sắp hết hạn (7 ngày)</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">@ViewBag.KhuyenMaiHetHan</h4>
+                        <p class="card-text">Đã hết hạn</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-times-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thống kê sử dụng trong tháng -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar"></i>
+                    Thống kê sử dụng tháng này
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h3 class="text-primary">@ViewBag.TongLuotSuDung</h3>
+                        <p class="text-muted">Lượt sử dụng</p>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-success">@(((decimal)ViewBag.TongTienTietKiem).ToString("N0")) VNĐ</h3>
+                        <p class="text-muted">Tổng tiền tiết kiệm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie"></i>
+                    Biểu đồ sử dụng theo ngày
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chartSuDungTheoNgay" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top khuyến mãi được sử dụng nhiều nhất -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-trophy"></i>
+                    Top 5 khuyến mãi được sử dụng nhiều nhất (tháng này)
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.TopKhuyenMai != null && ((IEnumerable<dynamic>)ViewBag.TopKhuyenMai).Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Hạng</th>
+                                    <th>Mã khuyến mãi</th>
+                                    <th>Tên chương trình</th>
+                                    <th>Số lượt sử dụng</th>
+                                    <th>Tổng tiền giảm</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var rank = 1;
+                                }
+                                @foreach (var item in (IEnumerable<dynamic>)ViewBag.TopKhuyenMai)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (rank == 1)
+                                            {
+                                                <span class="badge bg-warning text-dark"><i class="fas fa-crown"></i> #@rank</span>
+                                            }
+                                            else if (rank == 2)
+                                            {
+                                                <span class="badge bg-secondary"><i class="fas fa-medal"></i> #@rank</span>
+                                            }
+                                            else if (rank == 3)
+                                            {
+                                                <span class="badge bg-info"><i class="fas fa-award"></i> #@rank</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-light text-dark">#@rank</span>
+                                            }
+                                        </td>
+                                        <td><span class="badge bg-primary">@item.MaKhuyenMai</span></td>
+                                        <td>@item.TenKhuyenMai</td>
+                                        <td><strong>@item.SoLuotSuDung</strong> lượt</td>
+                                        <td><strong>@(((decimal)item.TongTienGiam).ToString("N0"))</strong> VNĐ</td>
+                                        <td>
+                                            <a asp-action="BaoCao" asp-route-id="@item.KhuyenMaiId" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-chart-line"></i> Báo cáo
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    rank++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        <p>Chưa có dữ liệu sử dụng khuyến mãi trong tháng này</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Biểu đồ sử dụng theo ngày
+        var ctx = document.getElementById('chartSuDungTheoNgay').getContext('2d');
+        var thongKeData = @Html.Raw(Json.Serialize(ViewBag.ThongKeTheoNgay));
+        
+        var labels = thongKeData.map(function(item) {
+            return new Date(item.ngay).toLocaleDateString('vi-VN');
+        });
+        
+        var data = thongKeData.map(function(item) {
+            return item.soLuotSuDung;
+        });
+
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Số lượt sử dụng',
+                    data: data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,148 @@
+@model DatVeXe.Models.KhuyenMai
+
+@{
+    ViewData["Title"] = "Tạo khuyến mãi mới - Simple";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Tạo khuyến mãi mới</h3>
+                    @if (ViewBag.TestMessage != null)
+                    {
+                        <div class="alert alert-info">@ViewBag.TestMessage</div>
+                    }
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="TenKhuyenMai" class="form-label">Tên khuyến mãi *</label>
+                                    <input asp-for="TenKhuyenMai" class="form-control" placeholder="Nhập tên khuyến mãi" />
+                                    <span asp-validation-for="TenKhuyenMai" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="MaKhuyenMai" class="form-label">Mã khuyến mãi *</label>
+                                    <input asp-for="MaKhuyenMai" class="form-control" placeholder="Nhập mã khuyến mãi" />
+                                    <span asp-validation-for="MaKhuyenMai" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label asp-for="MoTa" class="form-label">Mô tả</label>
+                                    <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Mô tả khuyến mãi"></textarea>
+                                    <span asp-validation-for="MoTa" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="LoaiKhuyenMai" class="form-label">Loại khuyến mãi *</label>
+                                    <select asp-for="LoaiKhuyenMai" class="form-select">
+                                        <option value="">-- Chọn loại --</option>
+                                        @if (ViewBag.LoaiKhuyenMaiList != null)
+                                        {
+                                            foreach (LoaiKhuyenMai item in ViewBag.LoaiKhuyenMaiList)
+                                            {
+                                                <option value="@((int)item)">
+                                                    @(item == LoaiKhuyenMai.GiamPhanTram ? "Giảm theo phần trăm" :
+                                                      item == LoaiKhuyenMai.GiamSoTien ? "Giảm theo số tiền" : "Miễn phí")
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="LoaiKhuyenMai" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="GiaTri" class="form-label">Giá trị *</label>
+                                    <input asp-for="GiaTri" type="number" step="0.01" min="0" class="form-control" placeholder="0" />
+                                    <span asp-validation-for="GiaTri" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="GiaTriToiDa" class="form-label">Giá trị tối đa (VNĐ)</label>
+                                    <input asp-for="GiaTriToiDa" type="number" min="0" class="form-control" placeholder="0" />
+                                    <span asp-validation-for="GiaTriToiDa" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="NgayBatDau" class="form-label">Ngày bắt đầu *</label>
+                                    <input asp-for="NgayBatDau" type="datetime-local" class="form-control" />
+                                    <span asp-validation-for="NgayBatDau" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="NgayKetThuc" class="form-label">Ngày kết thúc *</label>
+                                    <input asp-for="NgayKetThuc" type="datetime-local" class="form-control" />
+                                    <span asp-validation-for="NgayKetThuc" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="SoLuongToiDa" class="form-label">Số lượng tối đa</label>
+                                    <input asp-for="SoLuongToiDa" type="number" min="1" class="form-control" placeholder="Không giới hạn" />
+                                    <span asp-validation-for="SoLuongToiDa" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="SoLanSuDungToiDa" class="form-label">Số lần sử dụng/khách hàng</label>
+                                    <input asp-for="SoLanSuDungToiDa" type="number" min="1" class="form-control" placeholder="1" />
+                                    <span asp-validation-for="SoLanSuDungToiDa" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-check mb-3">
+                                    <input asp-for="TrangThaiHoatDong" class="form-check-input" type="checkbox" />
+                                    <label asp-for="TrangThaiHoatDong" class="form-check-label">
+                                        Kích hoạt khuyến mãi
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Tạo khuyến mãi
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

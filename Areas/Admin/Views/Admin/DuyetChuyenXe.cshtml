@@ -1,0 +1,261 @@
+@model IEnumerable<DatVeXe.Models.ChuyenXe>
+
+@{
+    ViewData["Title"] = "Duyệt chuyến xe";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-clipboard-check"></i>
+                        Duyệt chuyến xe mới
+                    </h3>
+                    <div class="card-tools">
+                        <span class="badge badge-warning">
+                            @Model.Count() chuyến đang chờ duyệt
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped" id="duyetTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tuyến đường</th>
+                                        <th>Xe</th>
+                                        <th>Tài xế</th>
+                                        <th>Ngày khởi hành</th>
+                                        <th>Giá vé</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var chuyenXe in Model)
+                                    {
+                                        <tr data-chuyen-id="@chuyenXe.ChuyenXeId">
+                                            <td>@chuyenXe.ChuyenXeId</td>
+                                            <td>
+                                                @if (chuyenXe.TuyenDuong != null)
+                                                {
+                                                    <strong>@chuyenXe.TuyenDuong.DiemDi → @chuyenXe.TuyenDuong.DiemDen</strong><br>
+                                                    <small class="text-muted">@chuyenXe.TuyenDuong.TenTuyen</small>
+                                                }
+                                                else
+                                                {
+                                                    <span>@chuyenXe.DiemDi → @chuyenXe.DiemDen</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (chuyenXe.Xe != null)
+                                                {
+                                                    <strong>@chuyenXe.Xe.BienSoXe</strong><br>
+                                                    <small class="text-muted">@chuyenXe.Xe.LoaiXe (@chuyenXe.Xe.SoGhe chỗ)</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (chuyenXe.TaiXe != null)
+                                                {
+                                                    <strong>@chuyenXe.TaiXe.HoTen</strong><br>
+                                                    <small class="text-muted">@chuyenXe.TaiXe.SoDienThoai</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Chưa phân công</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <strong>@chuyenXe.NgayKhoiHanh.ToString("dd/MM/yyyy")</strong><br>
+                                                <small class="text-muted">@chuyenXe.ThoiGianDi.ToString(@"hh\:mm")</small>
+                                            </td>
+                                            <td>
+                                                <span class="text-success font-weight-bold">
+                                                    @chuyenXe.Gia.ToString("N0") VNĐ
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small>@chuyenXe.NgayTao.ToString("dd/MM/yyyy HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-warning">Chờ duyệt</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-success"
+                                                            onclick="pheDuyetChuyenXe(@chuyenXe.ChuyenXeId, true)"
+                                                            title="Phê duyệt">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-danger"
+                                                            onclick="showRejectModal(@chuyenXe.ChuyenXeId)"
+                                                            title="Từ chối">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-info"
+                                                            onclick="viewDetail(@chuyenXe.ChuyenXeId)"
+                                                            title="Xem chi tiết">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h4>Không có chuyến xe nào cần duyệt</h4>
+                            <p class="text-muted">Tất cả chuyến xe đã được xử lý.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal từ chối -->
+<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Từ chối chuyến xe</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="lyDoTuChoi">Lý do từ chối:</label>
+                    <textarea id="lyDoTuChoi" class="form-control" rows="4" 
+                              placeholder="Nhập lý do từ chối chuyến xe..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" onclick="confirmReject()">
+                    <i class="fas fa-times"></i> Từ chối
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentChuyenXeId = 0;
+
+        $(document).ready(function() {
+            $('#duyetTable').DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "order": [[ 6, "desc" ]],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json"
+                }
+            });
+        });
+
+        function pheDuyetChuyenXe(chuyenXeId, pheDuyet) {
+            if (confirm('Bạn có chắc chắn muốn phê duyệt chuyến xe này?')) {
+                $.ajax({
+                    url: '@Url.Action("PheDuyetChuyenXe", "Admin")',
+                    type: 'POST',
+                    data: { 
+                        chuyenXeId: chuyenXeId, 
+                        pheDuyet: pheDuyet 
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $('tr[data-chuyen-id="' + chuyenXeId + '"]').fadeOut(function() {
+                                $(this).remove();
+                                // Update badge count
+                                updateBadgeCount();
+                            });
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Có lỗi xảy ra khi xử lý yêu cầu');
+                    }
+                });
+            }
+        }
+
+        function showRejectModal(chuyenXeId) {
+            currentChuyenXeId = chuyenXeId;
+            $('#lyDoTuChoi').val('');
+            $('#rejectModal').modal('show');
+        }
+
+        function confirmReject() {
+            var lyDo = $('#lyDoTuChoi').val().trim();
+            if (lyDo === '') {
+                toastr.warning('Vui lòng nhập lý do từ chối');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("PheDuyetChuyenXe", "Admin")',
+                type: 'POST',
+                data: { 
+                    chuyenXeId: currentChuyenXeId, 
+                    pheDuyet: false,
+                    lyDo: lyDo
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $('#rejectModal').modal('hide');
+                        $('tr[data-chuyen-id="' + currentChuyenXeId + '"]').fadeOut(function() {
+                            $(this).remove();
+                            updateBadgeCount();
+                        });
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function() {
+                    toastr.error('Có lỗi xảy ra khi xử lý yêu cầu');
+                }
+            });
+        }
+
+        function viewDetail(chuyenXeId) {
+            // Implement view detail functionality
+            window.location.href = '@Url.Action("QuanLyChuyenXe", "Admin")';
+        }
+
+        function updateBadgeCount() {
+            var remainingRows = $('#duyetTable tbody tr:visible').length;
+            $('.badge-warning').text(remainingRows + ' chuyến đang chờ duyệt');
+            
+            if (remainingRows === 0) {
+                $('.card-body').html(`
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h4>Không có chuyến xe nào cần duyệt</h4>
+                        <p class="text-muted">Tất cả chuyến xe đã được xử lý.</p>
+                    </div>
+                `);
+            }
+        }
+    </script>
+}

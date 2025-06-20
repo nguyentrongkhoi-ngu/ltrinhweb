@@ -1,0 +1,303 @@
+@model IEnumerable<DatVeXe.Models.TuyenDuong>
+@{
+    ViewData["Title"] = "Quản lý tuyến đường";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 style="color: #2c3e50; font-weight: 600;">
+        <i class="fas fa-route" style="color: #f39c12;"></i>
+        Quản lý tuyến đường
+    </h3>
+    <div class="d-flex gap-2">
+        <a asp-action="ThongKe" class="btn btn-info">
+            <i class="fas fa-chart-bar"></i>
+            Thống kê
+        </a>
+        <a asp-action="Create" class="btn" style="background-color: #f39c12; border-color: #f39c12; color: white;">
+            <i class="fas fa-plus"></i>
+            Thêm tuyến đường
+        </a>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="Index">
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label" style="color: black;">Tìm kiếm</label>
+                    <input type="text" name="searchString" value="@ViewBag.CurrentFilter"
+                           class="form-control" placeholder="Tên tuyến, điểm đi, điểm đến..." />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" style="color: black;">Trạng thái</label>
+                    <select name="trangThai" class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="true" selected="@(ViewBag.TrangThaiFilter == true)">Hoạt động</option>
+                        <option value="false" selected="@(ViewBag.TrangThaiFilter == false)">Ngừng hoạt động</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" style="color: black;">Sắp xếp theo</label>
+                    <select name="sortOrder" class="form-select">
+                        <option value="" selected="@(ViewBag.CurrentSort == "")">Tên A-Z</option>
+                        <option value="name_desc" selected="@(ViewBag.CurrentSort == "name_desc")">Tên Z-A</option>
+                        <option value="distance" selected="@(ViewBag.CurrentSort == "distance")">Khoảng cách tăng dần</option>
+                        <option value="distance_desc" selected="@(ViewBag.CurrentSort == "distance_desc")">Khoảng cách giảm dần</option>
+                        <option value="price" selected="@(ViewBag.CurrentSort == "price")">Giá vé tăng dần</option>
+                        <option value="price_desc" selected="@(ViewBag.CurrentSort == "price_desc")">Giá vé giảm dần</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-refresh"></i> Đặt lại
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Routes Table -->
+<div class="card">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>
+            Danh sách tuyến đường (@ViewBag.TotalCount)
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead style="background-color: #34495e; color: white;">
+                    <tr>
+                        <th>
+                            <a href="@Url.Action("Index", new { sortOrder = ViewBag.NameSortParm, searchString = ViewBag.CurrentFilter, trangThai = ViewBag.TrangThaiFilter })"
+                               class="text-white text-decoration-none">
+                                Tên tuyến
+                                @if (ViewBag.CurrentSort == "")
+                                {
+                                    <i class="fas fa-sort-up"></i>
+                                }
+                                else if (ViewBag.CurrentSort == "name_desc")
+                                {
+                                    <i class="fas fa-sort-down"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>Tuyến đường</th>
+                        <th>
+                            <a href="@Url.Action("Index", new { sortOrder = ViewBag.DistanceSortParm, searchString = ViewBag.CurrentFilter, trangThai = ViewBag.TrangThaiFilter })"
+                               class="text-white text-decoration-none">
+                                Khoảng cách
+                                @if (ViewBag.CurrentSort == "distance")
+                                {
+                                    <i class="fas fa-sort-up"></i>
+                                }
+                                else if (ViewBag.CurrentSort == "distance_desc")
+                                {
+                                    <i class="fas fa-sort-down"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>Thời gian</th>
+                        <th>
+                            <a href="@Url.Action("Index", new { sortOrder = ViewBag.PriceSortParm, searchString = ViewBag.CurrentFilter, trangThai = ViewBag.TrangThaiFilter })"
+                               class="text-white text-decoration-none">
+                                Giá vé
+                                @if (ViewBag.CurrentSort == "price")
+                                {
+                                    <i class="fas fa-sort-up"></i>
+                                }
+                                else if (ViewBag.CurrentSort == "price_desc")
+                                {
+                                    <i class="fas fa-sort-down"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-sort"></i>
+                                }
+                            </a>
+                        </th>
+                        <th>Chuyến xe</th>
+                        <th>Trạng thái</th>
+                        <th width="200">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr id="route-row-@item.TuyenDuongId">
+                            <td>
+                                <div>
+                                    <strong>@item.TenTuyen</strong>
+                                    @if (!string.IsNullOrEmpty(item.MoTa))
+                                    {
+                                        <br><small class="text-muted">@item.MoTa</small>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-map-marker-alt text-success me-1"></i>
+                                    <span class="me-2">@item.DiemDi</span>
+                                    <i class="fas fa-arrow-right text-muted me-2"></i>
+                                    <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                    <span>@item.DiemDen</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">@item.KhoangCach km</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark text-white">@item.ThoiGianDuKien giờ</span>
+                            </td>
+                            <td>
+                                <strong class="text-success">@item.GiaVe.ToString("N0") VNĐ</strong>
+                            </td>
+                            <td>
+                                <div class="text-center">
+                                    <strong>@(item.ChuyenXes?.Count ?? 0)</strong>
+                                    <br><small class="text-muted">chuyến</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-@(item.TrangThaiHoatDong ? "success" : "dark text-white")"
+                                      id="status-badge-@item.TuyenDuongId">
+                                    <i class="fas fa-@(item.TrangThaiHoatDong ? "check" : "pause") me-1"></i>
+                                    @(item.TrangThaiHoatDong ? "Hoạt động" : "Ngừng hoạt động")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.TuyenDuongId"
+                                       class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.TuyenDuongId"
+                                       class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-@(item.TrangThaiHoatDong ? "danger" : "success")"
+                                            onclick="toggleStatus(@item.TuyenDuongId)"
+                                            title="@(item.TrangThaiHoatDong ? "Vô hiệu hóa" : "Kích hoạt")">
+                                        <i class="fas fa-@(item.TrangThaiHoatDong ? "pause" : "play")"></i>
+                                    </button>
+                                    @if ((item.ChuyenXes?.Count ?? 0) == 0)
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@item.TuyenDuongId"
+                                           class="btn btn-sm btn-outline-danger" title="Xóa"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa tuyến đường này?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+@if (ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Phân trang tuyến đường" class="mt-4">
+        <ul class="pagination justify-content-center">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, searchString = ViewBag.CurrentFilter, trangThai = ViewBag.TrangThaiFilter, sortOrder = ViewBag.CurrentSort })">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            }
+
+            @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = ViewBag.CurrentFilter, trangThai = ViewBag.TrangThaiFilter, sortOrder = ViewBag.CurrentSort })">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, searchString = ViewBag.CurrentFilter, trangThai = ViewBag.TrangThaiFilter, sortOrder = ViewBag.CurrentSort })">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@section Scripts {
+    <script>
+        function toggleStatus(tuyenDuongId) {
+            if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái tuyến đường này?')) {
+                $.post('@Url.Action("ToggleStatus")', { tuyenDuongId: tuyenDuongId })
+                    .done(function(data) {
+                        if (data.success) {
+                            // Update badge
+                            const badge = $('#status-badge-' + tuyenDuongId);
+                            if (data.isActive) {
+                                badge.removeClass('bg-dark text-white').addClass('bg-success');
+                                badge.html('<i class="fas fa-check me-1"></i>Hoạt động');
+                            } else {
+                                badge.removeClass('bg-success').addClass('bg-dark text-white');
+                                badge.html('<i class="fas fa-pause me-1"></i>Ngừng hoạt động');
+                            }
+
+                            showToast(data.message, 'success');
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    })
+                    .fail(function() {
+                        showToast('Có lỗi xảy ra khi thay đổi trạng thái', 'error');
+                    });
+            }
+        }
+
+        function showToast(message, type) {
+            const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const toast = $(`
+                <div class="toast align-items-center text-white ${toastClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `);
+
+            if (!$('#toast-container').length) {
+                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            }
+
+            $('#toast-container').append(toast);
+            toast.toast('show');
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+    </script>
+}

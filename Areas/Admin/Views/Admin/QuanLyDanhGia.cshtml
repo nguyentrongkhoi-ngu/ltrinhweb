@@ -1,0 +1,218 @@
+@model IEnumerable<DatVeXe.Models.DanhGiaChuyenDi>
+
+@{
+    ViewData["Title"] = "Quản lý Đánh giá";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-star"></i>
+                        Quản lý Đánh giá khách hàng
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="reviewTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Khách hàng</th>
+                                    <th>Tuyến đường</th>
+                                    <th>Điểm số</th>
+                                    <th>Nội dung</th>
+                                    <th>Thời gian</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var danhGia in Model)
+                                {
+                                    <tr data-review-id="@danhGia.DanhGiaId">
+                                        <td>@danhGia.DanhGiaId</td>
+                                        <td>
+                                            <strong>@danhGia.NguoiDung.HoTen</strong><br>
+                                            <small class="text-muted">@danhGia.NguoiDung.Email</small>
+                                        </td>
+                                        <td>
+                                            @if (danhGia.Ve?.ChuyenXe?.TuyenDuong != null)
+                                            {
+                                                <span>@danhGia.Ve.ChuyenXe.TuyenDuong.DiemDi → @danhGia.Ve.ChuyenXe.TuyenDuong.DiemDen</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="rating">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= danhGia.DiemSo)
+                                                    {
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star text-muted"></i>
+                                                    }
+                                                }
+                                                <span class="ml-2">(@danhGia.DiemSo/5)</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="review-content" style="max-width: 300px;">
+                                                @if (!string.IsNullOrEmpty(danhGia.NoiDung))
+                                                {
+                                                    if (danhGia.NoiDung.Length > 100)
+                                                    {
+                                                        <span class="short-content">@danhGia.NoiDung.Substring(0, 100)...</span>
+                                                        <span class="full-content" style="display: none;">@danhGia.NoiDung</span>
+                                                        <a href="#" class="toggle-content text-primary">Xem thêm</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>@danhGia.NoiDung</span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Không có nội dung</span>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small>@danhGia.ThoiGianDanhGia.ToString("dd/MM/yyyy HH:mm")</small>
+                                        </td>
+                                        <td>
+                                            @if (danhGia.BiAn)
+                                            {
+                                                <span class="badge badge-danger">Đã ẩn</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-success">Hiển thị</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" 
+                                                        class="btn btn-sm @(danhGia.BiAn ? "btn-success" : "btn-warning") toggle-visibility-btn"
+                                                        onclick="toggleReviewVisibility(@danhGia.DanhGiaId)"
+                                                        title="@(danhGia.BiAn ? "Hiển thị" : "Ẩn") đánh giá">
+                                                    <i class="fas @(danhGia.BiAn ? "fa-eye" : "fa-eye-slash")"></i>
+                                                </button>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-info"
+                                                        onclick="viewReviewDetail(@danhGia.DanhGiaId)"
+                                                        title="Xem chi tiết">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#reviewTable').DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "order": [[ 5, "desc" ]],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json"
+                }
+            });
+
+            // Toggle content
+            $('.toggle-content').click(function(e) {
+                e.preventDefault();
+                var container = $(this).closest('.review-content');
+                var shortContent = container.find('.short-content');
+                var fullContent = container.find('.full-content');
+                
+                if (fullContent.is(':visible')) {
+                    fullContent.hide();
+                    shortContent.show();
+                    $(this).text('Xem thêm');
+                } else {
+                    shortContent.hide();
+                    fullContent.show();
+                    $(this).text('Thu gọn');
+                }
+            });
+        });
+
+        function toggleReviewVisibility(reviewId) {
+            if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái hiển thị của đánh giá này?')) {
+                $.ajax({
+                    url: '@Url.Action("ToggleReviewVisibility", "Admin")',
+                    type: 'POST',
+                    data: { reviewId: reviewId },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            // Update UI
+                            var row = $('tr[data-review-id="' + reviewId + '"]');
+                            var statusCell = row.find('td:nth-child(7)');
+                            var actionBtn = row.find('.toggle-visibility-btn');
+                            
+                            if (response.isHidden) {
+                                statusCell.html('<span class="badge badge-danger">Đã ẩn</span>');
+                                actionBtn.removeClass('btn-warning').addClass('btn-success');
+                                actionBtn.find('i').removeClass('fa-eye-slash').addClass('fa-eye');
+                                actionBtn.attr('title', 'Hiển thị đánh giá');
+                            } else {
+                                statusCell.html('<span class="badge badge-success">Hiển thị</span>');
+                                actionBtn.removeClass('btn-success').addClass('btn-warning');
+                                actionBtn.find('i').removeClass('fa-eye').addClass('fa-eye-slash');
+                                actionBtn.attr('title', 'Ẩn đánh giá');
+                            }
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Có lỗi xảy ra khi xử lý yêu cầu');
+                    }
+                });
+            }
+        }
+
+        function viewReviewDetail(reviewId) {
+            // Implement modal or redirect to detail view
+            window.location.href = '@Url.Action("Details", "Admin")/' + reviewId;
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .rating i {
+            font-size: 14px;
+        }
+        
+        .review-content {
+            word-wrap: break-word;
+        }
+        
+        .toggle-content {
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .toggle-content:hover {
+            text-decoration: underline;
+        }
+    </style>
+}

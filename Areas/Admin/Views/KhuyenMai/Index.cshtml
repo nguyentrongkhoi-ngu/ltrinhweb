@@ -1,0 +1,565 @@
+@model IEnumerable<DatVeXe.Models.KhuyenMai>
+
+@{
+    ViewData["Title"] = "Quản lý khuyến mãi";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .promotion-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin: -1.5rem -1.5rem 2rem -1.5rem;
+        border-radius: 0 0 15px 15px;
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .stat-card h3, .stat-card p {
+        color: white !important;
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+        color: white !important;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+    }
+
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #545b62 100%) !important;
+    }
+
+    .promotion-table {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background: white;
+    }
+
+    .table thead th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa !important;
+        transform: scale(1.01);
+    }
+
+    .table tbody td {
+        color: #2c3e50 !important;
+        border-color: #e9ecef;
+        vertical-align: middle;
+    }
+
+    .action-buttons .btn {
+        margin: 0 2px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .promotion-badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .promotion-badge.bg-primary {
+        background-color: #007bff !important;
+        color: white !important;
+    }
+
+    .promotion-badge.bg-info {
+        background-color: #17a2b8 !important;
+        color: white !important;
+    }
+
+    .promotion-badge.bg-success {
+        background-color: #28a745 !important;
+        color: white !important;
+    }
+
+    .promotion-badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+    }
+
+    .promotion-badge.bg-secondary {
+        background-color: #6c757d !important;
+        color: white !important;
+    }
+
+    .quick-actions {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .quick-actions h5 {
+        color: #2c3e50;
+    }
+
+    .card-title {
+        color: #2c3e50;
+    }
+
+    .time-info small {
+        color: #6c757d !important;
+        font-weight: 500;
+    }
+
+    .usage-info .fw-semibold {
+        color: #2c3e50 !important;
+    }
+
+    .usage-info .text-muted {
+        color: #6c757d !important;
+    }
+
+    .table-warning {
+        background-color: #fff3cd !important;
+    }
+
+    .table-warning td {
+        color: #856404 !important;
+    }
+
+    .text-dark {
+        color: #212529 !important;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .card-header {
+        background-color: #f8f9fa !important;
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+
+    .card-header .card-title {
+        color: #2c3e50 !important;
+        font-weight: 600;
+    }
+</style>
+
+<!-- Header Section -->
+<div class="promotion-header">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-2">
+                    <i class="fas fa-tags me-3"></i>
+                    Quản lý khuyến mãi
+                </h2>
+                <p class="mb-0 opacity-75">Tạo và quản lý các chương trình khuyến mãi để thu hút khách hàng</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a asp-action="Create" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>
+                    Tạo khuyến mãi mới
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h5 class="mb-0">
+                <i class="fas fa-bolt text-warning me-2"></i>
+                Thao tác nhanh
+            </h5>
+        </div>
+        <div class="col-md-4">
+            <div class="btn-group w-100" role="group">
+                <a asp-action="Dashboard" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a asp-action="LichSuSuDung" class="btn btn-outline-info">
+                    <i class="fas fa-history"></i> Lịch sử
+                </a>
+                <a asp-action="TimKiemNangCao" class="btn btn-outline-secondary">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stat-card bg-gradient-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <h3 class="mb-1 fw-bold">@Model.Count()</h3>
+                        <p class="mb-0 small">Tổng khuyến mãi</p>
+                    </div>
+                    <div class="col-4 text-end">
+                        <i class="fas fa-tags stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stat-card bg-gradient-success text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <h3 class="mb-1 fw-bold">@Model.Count(k => k.TrangThaiHoatDong && k.NgayBatDau <= DateTime.Now && k.NgayKetThuc >= DateTime.Now)</h3>
+                        <p class="mb-0 small">Đang hoạt động</p>
+                    </div>
+                    <div class="col-4 text-end">
+                        <i class="fas fa-play-circle stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stat-card bg-gradient-warning text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <h3 class="mb-1 fw-bold">@Model.Count(k => k.TrangThaiHoatDong && k.NgayKetThuc <= DateTime.Now.AddDays(7) && k.NgayKetThuc >= DateTime.Now)</h3>
+                        <p class="mb-0 small">Sắp hết hạn</p>
+                    </div>
+                    <div class="col-4 text-end">
+                        <i class="fas fa-exclamation-triangle stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stat-card bg-gradient-secondary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <h3 class="mb-1 fw-bold">@Model.Count(k => k.NgayKetThuc < DateTime.Now)</h3>
+                        <p class="mb-0 small">Đã hết hạn</p>
+                    </div>
+                    <div class="col-4 text-end">
+                        <i class="fas fa-times-circle stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Promotions Table -->
+<div class="card promotion-table">
+    <div class="card-header border-0">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Danh sách khuyến mãi
+                </h5>
+            </div>
+            <div class="col-md-6 text-end">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="refreshTable()">
+                        <i class="fas fa-sync-alt"></i> Làm mới
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="exportData()">
+                        <i class="fas fa-download"></i> Xuất dữ liệu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="promotionsTable">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Mã khuyến mãi</th>
+                            <th>Tên chương trình</th>
+                            <th>Loại & Giá trị</th>
+                            <th>Thời gian hiệu lực</th>
+                            <th>Sử dụng</th>
+                            <th>Trạng thái</th>
+                            <th class="text-center pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var now = DateTime.Now;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            var isActive = item.TrangThaiHoatDong && item.NgayBatDau <= now && item.NgayKetThuc >= now;
+                            var isExpired = item.NgayKetThuc < now;
+                            var isUpcoming = item.NgayBatDau > now;
+                            var isExpiringSoon = !isExpired && item.NgayKetThuc <= now.AddDays(7);
+                            <tr class="@(isExpiringSoon ? "table-warning" : "")">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="promotion-code-badge me-2">
+                                            <span class="promotion-badge bg-primary">@item.MaKhuyenMai</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold text-dark">@item.TenKhuyenMai</h6>
+                                        @if (!string.IsNullOrEmpty(item.MoTa))
+                                        {
+                                            <small class="text-muted">@(item.MoTa.Length > 50 ? item.MoTa.Substring(0, 50) + "..." : item.MoTa)</small>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        @if (item.LoaiKhuyenMai == LoaiKhuyenMai.GiamPhanTram)
+                                        {
+                                            <span class="promotion-badge bg-info">
+                                                <i class="fas fa-percentage me-1"></i>@item.GiaTri%
+                                            </span>
+                                            @if (item.GiaTriToiDa.HasValue)
+                                            {
+                                                <br><small class="text-muted">Tối đa: @item.GiaTriToiDa.Value.ToString("N0")đ</small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="promotion-badge bg-success">
+                                                <i class="fas fa-money-bill me-1"></i>@item.GiaTri.ToString("N0")đ
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="time-info">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="fas fa-calendar-alt text-muted me-2"></i>
+                                            <small>@item.NgayBatDau.ToString("dd/MM/yyyy")</small>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-calendar-times text-muted me-2"></i>
+                                            <small>@item.NgayKetThuc.ToString("dd/MM/yyyy")</small>
+                                        </div>
+                                        @if (isExpiringSoon && !isExpired)
+                                        {
+                                            <small class="text-warning fw-bold">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                                Còn @((item.NgayKetThuc - DateTime.Now).Days) ngày
+                                            </small>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="usage-info">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="fw-semibold">@item.SoLuongDaSuDung</span>
+                                            <span class="text-muted">/@(item.SoLuongToiDa?.ToString() ?? "∞")</span>
+                                        </div>
+                                        @if (item.SoLuongToiDa.HasValue)
+                                        {
+                                            var percentage = (double)item.SoLuongDaSuDung / item.SoLuongToiDa.Value * 100;
+                                            <div class="progress" style="height: 4px;">
+                                                <div class="progress-bar @(percentage > 80 ? "bg-warning" : "bg-primary")"
+                                                     style="width: @percentage%"></div>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (isExpired)
+                                    {
+                                        <span class="promotion-badge bg-secondary">
+                                            <i class="fas fa-times-circle me-1"></i>Đã hết hạn
+                                        </span>
+                                    }
+                                    else if (isActive)
+                                    {
+                                        <span class="promotion-badge bg-success">
+                                            <i class="fas fa-play-circle me-1"></i>Đang hoạt động
+                                        </span>
+                                    }
+                                    else if (isUpcoming)
+                                    {
+                                        <span class="promotion-badge bg-info">
+                                            <i class="fas fa-clock me-1"></i>Sắp diễn ra
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="promotion-badge bg-warning">
+                                            <i class="fas fa-pause-circle me-1"></i>Tạm dừng
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <div class="action-buttons">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@item.KhuyenMaiId"
+                                               class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.KhuyenMaiId"
+                                               class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                        data-bs-toggle="dropdown" title="Thêm">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" asp-action="Copy" asp-route-id="@item.KhuyenMaiId">
+                                                        <i class="fas fa-copy me-2"></i>Sao chép
+                                                    </a></li>
+                                                    <li><a class="dropdown-item" asp-action="BaoCao" asp-route-id="@item.KhuyenMaiId">
+                                                        <i class="fas fa-chart-line me-2"></i>Báo cáo
+                                                    </a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#"
+                                                           onclick="confirmDelete(@item.KhuyenMaiId, '@item.TenKhuyenMai')">
+                                                        <i class="fas fa-trash me-2"></i>Xóa
+                                                    </a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-tags fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">Chưa có khuyến mãi nào</h4>
+                    <p class="text-muted mb-4">
+                        Hiện tại chưa có chương trình khuyến mãi nào.<br>
+                        Hãy tạo chương trình khuyến mãi đầu tiên để thu hút khách hàng.
+                    </p>
+                    <a asp-action="Create" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>
+                        Tạo khuyến mãi đầu tiên
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Confirm delete function
+        function confirmDelete(id, name) {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: `Bạn có chắc chắn muốn xóa chương trình khuyến mãi "${name}" không?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var form = document.createElement('form');
+                    form.method = 'post';
+                    form.action = '@Url.Action("Delete")';
+
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'id';
+                    input.value = id;
+
+                    var token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '__RequestVerificationToken';
+                    token.value = $('input[name="__RequestVerificationToken"]').val();
+
+                    form.appendChild(input);
+                    form.appendChild(token);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // Refresh table function
+        function refreshTable() {
+            location.reload();
+        }
+
+        // Export data function
+        function exportData() {
+            window.open('@Url.Action("XuatBaoCao", "KhuyenMai")', '_blank');
+        }
+
+        // Initialize tooltips
+        $(document).ready(function() {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Add animation to stat cards
+            $('.stat-card').hover(
+                function() {
+                    $(this).addClass('shadow-lg');
+                },
+                function() {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+        });
+    </script>
+}

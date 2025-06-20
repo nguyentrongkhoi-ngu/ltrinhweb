@@ -1,0 +1,239 @@
+@model DatVeXe.Models.KhuyenMai
+
+@{
+    ViewData["Title"] = "Chi tiết khuyến mãi";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Chi tiết khuyến mãi</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "KhuyenMai")">Quản lý khuyến mãi</a></li>
+                        <li class="breadcrumb-item active">Chi tiết</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-tag mr-2"></i>
+                                @Model.TenKhuyenMai
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">Mã khuyến mãi:</dt>
+                                        <dd class="col-sm-7">
+                                            <span class="badge badge-primary">@Model.MaKhuyenMai</span>
+                                        </dd>
+
+                                        <dt class="col-sm-5">Loại khuyến mãi:</dt>
+                                        <dd class="col-sm-7">
+                                            @if (Model.LoaiKhuyenMai == LoaiKhuyenMai.GiamPhanTram)
+                                            {
+                                                <span class="badge badge-info">Giảm theo phần trăm</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-warning">Giảm theo số tiền</span>
+                                            }
+                                        </dd>
+
+                                        <dt class="col-sm-5">Giá trị:</dt>
+                                        <dd class="col-sm-7">
+                                            @if (Model.LoaiKhuyenMai == LoaiKhuyenMai.GiamPhanTram)
+                                            {
+                                                <strong>@Model.GiaTri%</strong>
+                                            }
+                                            else
+                                            {
+                                                <strong>@Model.GiaTri.ToString("N0") VNĐ</strong>
+                                            }
+                                        </dd>
+
+                                        @if (Model.GiaTriToiDa.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Giá trị tối đa:</dt>
+                                            <dd class="col-sm-7">
+                                                <strong>@Model.GiaTriToiDa.Value.ToString("N0") VNĐ</strong>
+                                            </dd>
+                                        }
+
+                                        @if (Model.GiaTriDonHangToiThieu.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Đơn hàng tối thiểu:</dt>
+                                            <dd class="col-sm-7">
+                                                <strong>@Model.GiaTriDonHangToiThieu.Value.ToString("N0") VNĐ</strong>
+                                            </dd>
+                                        }
+                                    </dl>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">Ngày bắt đầu:</dt>
+                                        <dd class="col-sm-7">@Model.NgayBatDau.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                                        <dt class="col-sm-5">Ngày kết thúc:</dt>
+                                        <dd class="col-sm-7">@Model.NgayKetThuc.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                                        @if (Model.SoLuongToiDa.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Số lượng:</dt>
+                                            <dd class="col-sm-7">
+                                                @Model.SoLuongDaSuDung / @Model.SoLuongToiDa
+                                                <div class="progress mt-1" style="height: 10px;">
+                                                    @{
+                                                        var percent = Model.SoLuongToiDa > 0 ? (Model.SoLuongDaSuDung * 100.0 / Model.SoLuongToiDa.Value) : 0;
+                                                    }
+                                                    <div class="progress-bar" style="width: @percent%"></div>
+                                                </div>
+                                            </dd>
+                                        }
+
+                                        @if (Model.SoLanSuDungToiDa.HasValue)
+                                        {
+                                            <dt class="col-sm-5">Sử dụng tối đa:</dt>
+                                            <dd class="col-sm-7">@Model.SoLanSuDungToiDa lần/người</dd>
+                                        }
+
+                                        <dt class="col-sm-5">Trạng thái:</dt>
+                                        <dd class="col-sm-7">
+                                            @{
+                                                var isActive = Model.TrangThaiHoatDong && Model.NgayBatDau <= DateTime.Now && Model.NgayKetThuc >= DateTime.Now;
+                                                var isExpired = Model.NgayKetThuc < DateTime.Now;
+                                                var isUpcoming = Model.NgayBatDau > DateTime.Now;
+                                            }
+                                            @if (isExpired)
+                                            {
+                                                <span class="badge badge-secondary">Đã hết hạn</span>
+                                            }
+                                            else if (isUpcoming)
+                                            {
+                                                <span class="badge badge-info">Sắp diễn ra</span>
+                                            }
+                                            else if (isActive)
+                                            {
+                                                <span class="badge badge-success">Đang hoạt động</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-warning">Tạm dừng</span>
+                                            }
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.MoTa))
+                            {
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <h6>Mô tả:</h6>
+                                        <p class="text-muted">@Model.MoTa</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-cogs mr-2"></i>
+                                Thao tác
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.KhuyenMaiId">
+                                    <i class="fas fa-edit mr-2"></i>Chỉnh sửa
+                                </a>
+                                <a class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.KhuyenMaiId">
+                                    <i class="fas fa-trash mr-2"></i>Xóa
+                                </a>
+                                <button type="button" class="btn btn-secondary" onclick="toggleStatus(@Model.KhuyenMaiId, @Model.TrangThaiHoatDong.ToString().ToLower())">
+                                    @if (Model.TrangThaiHoatDong)
+                                    {
+                                        <i class="fas fa-pause mr-2"></i><text>Tạm dừng</text>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-play mr-2"></i><text>Kích hoạt</text>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Thông tin bổ sung
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">
+                                <strong>Ngày tạo:</strong> @Model.NgayTao.ToString("dd/MM/yyyy HH:mm")<br>
+                                @if (Model.NgayCapNhat.HasValue)
+                                {
+                                    <strong>Cập nhật cuối:</strong> @Model.NgayCapNhat.Value.ToString("dd/MM/yyyy HH:mm")
+                                }
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <a class="btn btn-secondary" asp-action="Index">
+                        <i class="fas fa-arrow-left mr-2"></i>Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleStatus(id, currentStatus) {
+            var newStatus = !currentStatus;
+            var statusText = newStatus ? 'kích hoạt' : 'tạm dừng';
+            
+            if (confirm('Bạn có chắc chắn muốn ' + statusText + ' khuyến mãi này?')) {
+                $.post('@Url.Action("ToggleStatus", "KhuyenMai")', { id: id, status: newStatus })
+                    .done(function(data) {
+                        if (data.success) {
+                            alert(data.message);
+                            location.reload();
+                        } else {
+                            alert('Lỗi: ' + data.message);
+                        }
+                    })
+                    .fail(function() {
+                        alert('Có lỗi xảy ra khi cập nhật trạng thái');
+                    });
+            }
+        }
+    </script>
+}
